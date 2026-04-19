@@ -216,7 +216,7 @@ class LaravelInitCommand extends Command
         if ($options['testing'] === 'pest') {
             $output->writeln('<info>🧪 Instalando PEST...</info>');
 
-            $process = new Process(['composer', 'require', 'pestphp/pest', '--dev', '--no-interaction', '-W']);
+            $process = new Process(['composer', 'require', 'pestphp/pest', 'pestphp/pest-plugin-laravel', '--dev', '--no-interaction', '-W']);
             $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
@@ -224,7 +224,8 @@ class LaravelInitCommand extends Command
             });
 
             if ($process->isSuccessful()) {
-                $process = new Process(['php', 'artisan', 'pest:install', '--no-interaction']);
+                $output->writeln('<info>🧪 Inicializando PEST...</info>');
+                $process = new Process(['./vendor/bin/pest', '--init']);
                 $process->setWorkingDirectory($projectPath);
                 $process->setTimeout(null);
                 $process->run(function ($type, $line) use ($output) {

@@ -79,12 +79,12 @@ php artisan volt:install
 {{USE_PEST}}
 echo "🧪 Instalando PEST..."
 {{USE_SAIL}}
-./vendor/bin/sail composer require pestphp/pest --dev --no-interaction -W
-./vendor/bin/sail artisan pest:install
+./vendor/bin/sail composer require pestphp/pest pestphp/pest-plugin-laravel --dev --no-interaction -W
+./vendor/bin/sail ./vendor/bin/pest --init
 {{/USE_SAIL}}
 {{!USE_SAIL}}
-composer require pestphp/pest --dev --no-interaction -W
-php artisan pest:install
+composer require pestphp/pest pestphp/pest-plugin-laravel --dev --no-interaction -W
+./vendor/bin/pest --init
 {{/!USE_SAIL}}
 {{/USE_PEST}}
 
@@ -93,12 +93,12 @@ php artisan pest:install
 echo "🎨 Instalando dependencias NPM..."
 {{USE_SAIL}}
 ./vendor/bin/sail npm install
-./vendor/bin/sail npm install -D tailwindcss postcss autoprefixer
+./vendor/bin/sail npm install -D tailwindcss@3 postcss autoprefixer
 ./vendor/bin/sail npx tailwindcss init -p
 {{/USE_SAIL}}
 {{!USE_SAIL}}
 npm install
-npm install -D tailwindcss postcss autoprefixer
+npm install -D tailwindcss@3 postcss autoprefixer
 npx tailwindcss init -p
 {{/!USE_SAIL}}
 {{/USE_VITE}}
