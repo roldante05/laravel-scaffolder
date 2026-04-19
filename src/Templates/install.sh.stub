@@ -90,16 +90,22 @@ composer require pestphp/pest pestphp/pest-plugin-laravel --dev --no-interaction
 
 # ─── Frontend (NPM + Tailwind) ────────────────────────────────────────────────
 {{USE_VITE}}
-echo "🎨 Instalando dependencias NPM..."
+echo "🎨 Configurando Tailwind CSS v4..."
 {{USE_SAIL}}
-./vendor/bin/sail npm install
-./vendor/bin/sail npm install -D tailwindcss@3 postcss autoprefixer
-./vendor/bin/sail npx tailwindcss init -p
+./vendor/bin/sail npm install tailwindcss @tailwindcss/vite
+# Asegurar que app.css tenga el import de v4
+if ! grep -q "@import \"tailwindcss\";" resources/css/app.css; then
+    echo -e "@import \"tailwindcss\";\n$(cat resources/css/app.css)" > resources/css/app.css
+fi
+# Limpieza de archivos obsoletos de v3
+rm -f tailwind.config.js postcss.config.js
 {{/USE_SAIL}}
 {{!USE_SAIL}}
-npm install
-npm install -D tailwindcss@3 postcss autoprefixer
-npx tailwindcss init -p
+npm install tailwindcss @tailwindcss/vite
+if ! grep -q "@import \"tailwindcss\";" resources/css/app.css; then
+    echo -e "@import \"tailwindcss\";\n$(cat resources/css/app.css)" > resources/css/app.css
+fi
+rm -f tailwind.config.js postcss.config.js
 {{/!USE_SAIL}}
 {{/USE_VITE}}
 
