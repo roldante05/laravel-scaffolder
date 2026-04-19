@@ -67,11 +67,11 @@ php artisan storage:link
 {{USE_LIVEWIRE}}
 echo "⚡ Instalando Livewire + Volt..."
 {{USE_SAIL}}
-./vendor/bin/sail composer require livewire/livewire livewire/volt --no-interaction
+./vendor/bin/sail composer require livewire/livewire livewire/volt --no-interaction -W
 ./vendor/bin/sail artisan volt:install
 {{/USE_SAIL}}
 {{!USE_SAIL}}
-composer require livewire/livewire livewire/volt --no-interaction
+composer require livewire/livewire livewire/volt --no-interaction -W
 php artisan volt:install
 {{/!USE_SAIL}}
 {{/USE_LIVEWIRE}}
@@ -79,11 +79,11 @@ php artisan volt:install
 {{USE_PEST}}
 echo "🧪 Instalando PEST..."
 {{USE_SAIL}}
-./vendor/bin/sail composer require pestphp/pest --dev --no-interaction
+./vendor/bin/sail composer require pestphp/pest --dev --no-interaction -W
 ./vendor/bin/sail artisan pest:install
 {{/USE_SAIL}}
 {{!USE_SAIL}}
-composer require pestphp/pest --dev --no-interaction
+composer require pestphp/pest --dev --no-interaction -W
 php artisan pest:install
 {{/!USE_SAIL}}
 {{/USE_PEST}}

@@ -192,7 +192,7 @@ class LaravelInitCommand extends Command
         if ($options['useLivewire']) {
             $output->writeln('<info>⚡ Instalando Livewire...</info>');
 
-            $process = new Process(['composer', 'require', 'livewire/livewire', 'livewire/volt', '--no-interaction']);
+            $process = new Process(['composer', 'require', 'livewire/livewire', 'livewire/volt', '--no-interaction', '-W']);
             $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
@@ -216,7 +216,7 @@ class LaravelInitCommand extends Command
         if ($options['testing'] === 'pest') {
             $output->writeln('<info>🧪 Instalando PEST...</info>');
 
-            $process = new Process(['composer', 'require', 'pestphp/pest', '--dev', '--no-interaction']);
+            $process = new Process(['composer', 'require', 'pestphp/pest', '--dev', '--no-interaction', '-W']);
             $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
