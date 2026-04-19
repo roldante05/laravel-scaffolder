@@ -5,7 +5,6 @@ namespace Roldante05\LaravelScaffolder\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\Option;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -21,9 +20,9 @@ class LaravelInitCommand extends Command
     {
         $this
             ->setName('init')
-            ->setDescription('Create a new Laravel project with customized options')
-            ->addArgument('project-name', InputArgument::REQUIRED, 'The name of the project to create')
-            ->setHelp('This command allows you to create a Laravel project with customizable options...');
+            ->setDescription('Crea un nuevo proyecto Laravel con opciones personalizadas')
+            ->addArgument('project-name', InputArgument::REQUIRED, 'El nombre del proyecto a crear')
+            ->setHelp('Este comando te permite crear un proyecto Laravel con opciones configurables de forma interactiva.');
     }
 
     /**
@@ -33,7 +32,6 @@ class LaravelInitCommand extends Command
     {
         $projectName = $input->getArgument('project-name');
 
-        // Validar nombre del proyecto
         if (empty($projectName)) {
             $output->writeln('<error>❌ Nombre de proyecto requerido</error>');
             return Command::FAILURE;
@@ -55,7 +53,7 @@ class LaravelInitCommand extends Command
         $output->writeln('');
 
         // Confirmar antes de continuar
-        if (!$this->confirm('¿Continuar con la creación del proyecto?', true, $input, $output)) {
+        if (!$this->confirm('¿Continuar con la creación del proyecto?', $input, $output, true)) {
             $output->writeln('<info>👋 Operación cancelada.</info>');
             return Command::SUCCESS;
         }
@@ -73,15 +71,12 @@ class LaravelInitCommand extends Command
     {
         $options = [];
 
-        // Preguntar si usar Laravel Sail con MySQL
         $question = new ConfirmationQuestion('¿Usar Laravel Sail con MySQL? [<comment>yes</comment>]: ', true);
         $options['useSail'] = $this->getHelper('question')->ask($input, $output, $question);
 
-        // Preguntar si incluir Livewire
-        $question = new ConfirmationQuestion('¿Incluir Livewire? [<comment>yes</comment>]: ', true);
+        $question = new ConfirmationQuestion('¿Incluir Livewire (con Volt)? [<comment>yes</comment>]: ', true);
         $options['useLivewire'] = $this->getHelper('question')->ask($input, $output, $question);
 
-        // Preguntar qué usar para assets
         $question = new ChoiceQuestion(
             '¿Qué usar para assets?',
             ['Vite (recomendado)', 'Webpack (legacy)'],
@@ -90,7 +85,6 @@ class LaravelInitCommand extends Command
         $answer = $this->getHelper('question')->ask($input, $output, $question);
         $options['frontend'] = str_contains($answer, 'Vite') ? 'vite' : 'webpack';
 
-        // Preguntar qué framework de tests usar
         $question = new ChoiceQuestion(
             '¿Qué framework de tests usar?',
             ['PEST (recomendado)', 'PHPUnit'],
@@ -104,21 +98,18 @@ class LaravelInitCommand extends Command
 
     /**
      * Crear el proyecto Laravel con las opciones especificadas.
-     *
-     * @param string $projectName
-     * @param array $options
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
     protected function createProject(string $projectName, array $options, InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>📦 Creando proyecto Laravel...</info>');
 
+        // Resolve la ruta absoluta donde se creará el proyecto
+        $projectPath = getcwd() . DIRECTORY_SEPARATOR . $projectName;
+
         try {
-            // Crear proyecto Laravel base
+            // 1. Crear proyecto Laravel base
             $process = new Process([
-                'composer', 'create-project', 'laravel/laravel:^12.0', $projectName, '--no-interaction'
+                'composer', 'create-project', 'laravel/laravel:^12.0', $projectName, '--no-interaction',
             ]);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
@@ -132,14 +123,11 @@ class LaravelInitCommand extends Command
             $output->writeln('<info>✅ Proyecto Laravel creado exitosamente</info>');
             $output->writeln('');
 
-            // Cambiar al directorio del proyecto
-            chdir($projectName);
+            // 2. Configurar paquetes (sin chdir — se pasa el cwd a cada proceso)
+            $this->configureProject($projectPath, $options, $output);
 
-            // Configurar según las opciones seleccionadas
-            $this->configureProject($options, $input, $output);
-
-            // Generar install.sh personalizado
-            $this->generateInstallScript($options, $output);
+            // 3. Generar install.sh personalizado
+            $this->generateInstallScript($projectPath, $options, $output);
 
             $output->writeln('<info>🎉 ¡Proyecto creado exitosamente!</info>');
             $output->writeln('');
@@ -149,6 +137,7 @@ class LaravelInitCommand extends Command
             $output->writeln('');
 
             return Command::SUCCESS;
+
         } catch (\Exception $e) {
             $output->writeln('<error>❌ Error al crear el proyecto: ' . $e->getMessage() . '</error>');
             return Command::FAILURE;
@@ -157,14 +146,8 @@ class LaravelInitCommand extends Command
 
     /**
      * Preguntar si se confirma una acción.
-     *
-     * @param string $question
-     * @param boolean $default
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return boolean
      */
-    protected function confirm(string $question, bool $default = false, InputInterface $input, OutputInterface $output): bool
+    protected function confirm(string $question, InputInterface $input, OutputInterface $output, bool $default = false): bool
     {
         $confirmationQuestion = new ConfirmationQuestion($question . ' [<comment>yes</comment>]: ', $default);
         return $this->getHelper('question')->ask($input, $output, $confirmationQuestion);
@@ -172,36 +155,45 @@ class LaravelInitCommand extends Command
 
     /**
      * Configurar el proyecto según las opciones seleccionadas.
-     *
-     * @param array $options
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return void
+     * Usa setWorkingDirectory() en lugar de chdir() para mayor seguridad.
      */
-    protected function configureProject(array $options, InputInterface $input, OutputInterface $output): void
+    protected function configureProject(string $projectPath, array $options, OutputInterface $output): void
     {
-        // Instalar Laravel Sail si se seleccionó
+        // Instalar Laravel Sail
         if ($options['useSail']) {
             $output->writeln('<info>⛵ Instalando Laravel Sail...</info>');
-            $process = new Process([
-                './vendor/bin/sail', 'install', '--with=mysql'
-            ]);
+
+            // Paso 1: requerir el paquete
+            $process = new Process(['composer', 'require', 'laravel/sail', '--dev', '--no-interaction']);
+            $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
                 $output->write($line);
             });
 
             if (!$process->isSuccessful()) {
-                $output->writeln('<warning>⚠️  Advertencia: Problema al instalar Sail, continuando...</warning>');
+                $output->writeln('<warning>⚠️  Advertencia: No se pudo instalar el paquete laravel/sail, continuando...</warning>');
+            } else {
+                // Paso 2: publicar la configuración de Sail con MySQL
+                $process = new Process(['php', 'artisan', 'sail:install', '--with=mysql', '--no-interaction']);
+                $process->setWorkingDirectory($projectPath);
+                $process->setTimeout(null);
+                $process->run(function ($type, $line) use ($output) {
+                    $output->write($line);
+                });
+
+                if (!$process->isSuccessful()) {
+                    $output->writeln('<warning>⚠️  Advertencia: Problema al configurar Sail, continuando...</warning>');
+                }
             }
         }
 
-        // Instalar Livewire si se seleccionó
+        // Instalar Livewire + Volt
         if ($options['useLivewire']) {
             $output->writeln('<info>⚡ Instalando Livewire...</info>');
-            $process = new Process([
-                'composer', 'require', 'livewire/livewire:^4.0', '--no-interaction'
-            ]);
+
+            $process = new Process(['composer', 'require', 'livewire/livewire', 'livewire/volt', '--no-interaction']);
+            $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
                 $output->write($line);
@@ -210,59 +202,44 @@ class LaravelInitCommand extends Command
             if (!$process->isSuccessful()) {
                 $output->writeln('<warning>⚠️  Advertencia: Problema al instalar Livewire, continuando...</warning>');
             } else {
-                // Instalar el starter kit de Livewire (Blaze)
-                $output->writeln('<info>🎨 Instalando Livewire Blaze starter kit...</info>');
-                $process = new Process([
-                    'composer', 'require', 'livewire/blaze:^1.0', '--dev', '--no-interaction'
-                ]);
+                $output->writeln('<info>🎨 Publicando Livewire Volt...</info>');
+                $process = new Process(['php', 'artisan', 'volt:install']);
+                $process->setWorkingDirectory($projectPath);
                 $process->setTimeout(null);
                 $process->run(function ($type, $line) use ($output) {
                     $output->write($line);
                 });
-
-                if ($process->isSuccessful()) {
-                    $process = new Process([
-                        'php', 'artisan', 'livewire:blaze', '--no-interaction'
-                    ]);
-                    $process->setTimeout(null);
-                    $process->run(function ($type, $line) use ($output) {
-                        $output->write($line);
-                    });
-                }
             }
         }
 
-        // Configurar testing framework
+        // Instalar PEST
         if ($options['testing'] === 'pest') {
             $output->writeln('<info>🧪 Instalando PEST...</info>');
-            $process = new Process([
-                'composer', 'require', 'pestphp/pest:^4.0', '--dev', '--no-interaction'
-            ]);
+
+            $process = new Process(['composer', 'require', 'pestphp/pest', '--dev', '--no-interaction']);
+            $process->setWorkingDirectory($projectPath);
             $process->setTimeout(null);
             $process->run(function ($type, $line) use ($output) {
                 $output->write($line);
             });
 
             if ($process->isSuccessful()) {
-                $process = new Process([
-                    'php', 'artisan', 'pest:install'
-                ]);
+                $process = new Process(['php', 'artisan', 'pest:install', '--no-interaction']);
+                $process->setWorkingDirectory($projectPath);
                 $process->setTimeout(null);
                 $process->run(function ($type, $line) use ($output) {
                     $output->write($line);
                 });
+            } else {
+                $output->writeln('<warning>⚠️  Advertencia: Problema al instalar PEST, continuando...</warning>');
             }
         }
     }
 
     /**
      * Generar el script install.sh personalizado basado en las opciones.
-     *
-     * @param array $options
-     * @param OutputInterface $output
-     * @return void
      */
-    protected function generateInstallScript(array $options, OutputInterface $output): void
+    protected function generateInstallScript(string $projectPath, array $options, OutputInterface $output): void
     {
         $stubPath = __DIR__ . '/../Templates/install.sh.stub';
 
@@ -273,39 +250,49 @@ class LaravelInitCommand extends Command
 
         $stub = file_get_contents($stubPath);
 
-        // Reemplazar placeholders con valores reales usando sintaxis simple
-        $replacements = [
-            '{{USE_SAIL}}' => $options['useSail'] ? '' : '# ',
-            '{{/USE_SAIL}}' => $options['useSail'] ? '' : '# ',
-            '{{USE_LIVEWIRE}}' => $options['useLivewire'] ? '' : '# ',
-            '{{/USE_LIVEWIRE}}' => $options['useLivewire'] ? '' : '# ',
-            '{{USE_PEST}}' => $options['testing'] === 'pest' ? '' : '# ',
-            '{{/USE_PEST}}' => $options['testing'] === 'pest' ? '' : '# ',
-            '{{!USE_SAIL}}' => !$options['useSail'] ? '' : '# ',
-            '{{/!USE_SAIL}}' => !$options['useSail'] ? '' : '# ',
-        ];
+        // Procesar bloques condicionales {{TAG}} ... {{/TAG}}
+        $stub = $this->processConditionalBlock($stub, 'USE_SAIL', $options['useSail']);
+        $stub = $this->processConditionalBlock($stub, 'USE_LIVEWIRE', $options['useLivewire']);
+        $stub = $this->processConditionalBlock($stub, 'USE_PEST', $options['testing'] === 'pest');
+        $stub = $this->processConditionalBlock($stub, 'USE_VITE', $options['frontend'] === 'vite');
 
-        foreach ($replacements as $placeholder => $replacement) {
-            $stub = str_replace($placeholder, $replacement, $stub);
-        }
+        // Limpiar líneas vacías consecutivas (máximo 1)
+        $stub = preg_replace("/\n{3,}/", "\n\n", $stub);
 
-        // Limpiar comentarios innecesarios y líneas vacías
-        $lines = explode("\n", $stub);
-        $cleanedLines = [];
-        foreach ($lines as $line) {
-            // Si la línea empieza con # y solo tiene espacios después, la ignoramos
-            if (trim($line) === '' || (str_starts_with(trim($line), '#') && strlen(trim($line)) === 1)) {
-                continue;
-            }
-            $cleanedLines[] = $line;
-        }
-
-        $stub = implode("\n", $cleanedLines);
-
-        // Escribir el archivo install.sh
-        file_put_contents('install.sh', $stub);
-        chmod('install.sh', 0755); // Hacer ejecutable
+        $installPath = $projectPath . DIRECTORY_SEPARATOR . 'install.sh';
+        file_put_contents($installPath, $stub);
+        chmod($installPath, 0755);
 
         $output->writeln('<info>📄 Script install.sh generado exitosamente</info>');
+    }
+
+    /**
+     * Procesa un bloque condicional en el stub:
+     *   {{TAG}} ... contenido ... {{/TAG}}  → se incluye si $condition es true
+     *   {{!TAG}} ... contenido ... {{/!TAG}} → se incluye si $condition es false
+     *
+     * Si la condición no se cumple, el bloque (incluidas sus líneas) se elimina completamente.
+     */
+    protected function processConditionalBlock(string $content, string $tag, bool $condition): string
+    {
+        // Bloque positivo: {{TAG}} ... {{/TAG}}
+        $content = preg_replace_callback(
+            '/\{\{' . $tag . '\}\}(.*?)\{\{\/' . $tag . '\}\}/s',
+            function (array $matches) use ($condition): string {
+                return $condition ? trim($matches[1]) . "\n" : '';
+            },
+            $content
+        );
+
+        // Bloque negado: {{!TAG}} ... {{/!TAG}}
+        $content = preg_replace_callback(
+            '/\{\{!' . $tag . '\}\}(.*?)\{\{\/!' . $tag . '\}\}/s',
+            function (array $matches) use ($condition): string {
+                return !$condition ? trim($matches[1]) . "\n" : '';
+            },
+            $content
+        );
+
+        return $content;
     }
 }

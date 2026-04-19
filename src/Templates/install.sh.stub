@@ -1,30 +1,34 @@
 #!/bin/bash
 set -e
 
-echo "🎵 Laravel Project - Install script (generado por laravel-scaffolder)"
-echo "================================================================"
+echo "🚀 Laravel Project - Install script (generado por laravel-scaffolder)"
+echo "======================================================================"
 
-# Chequeos iniciales
+# ─── Verificación de Docker (solo si se eligió Sail) ─────────────────────────
+{{USE_SAIL}}
 if ! command -v docker &> /dev/null; then
     echo "❌ Docker no encontrado. Instalalo primero."
     exit 1
 fi
 
 if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker no está corriendo."
+    echo "❌ Docker no está corriendo. Inicialo y volvé a ejecutar este script."
     exit 1
 fi
+{{/USE_SAIL}}
 
-echo "🧹 Limpiando cachés viejos..."
+# ─── Limpieza de cachés ───────────────────────────────────────────────────────
+echo "🧹 Limpiando cachés..."
 rm -rf vendor node_modules bootstrap/cache storage/framework/* 2>/dev/null || true
 
-# === FIX PRINCIPAL: creamos y damos permisos ANTES de cualquier composer ===
-echo "📁 Creando bootstrap/cache y storage con permisos Docker-friendly..."
+# ─── Permisos de directorios ──────────────────────────────────────────────────
+echo "📁 Creando directorios con permisos correctos..."
 mkdir -p bootstrap/cache storage/framework/{sessions,views,cache}
-chmod -R 777 bootstrap/cache storage/framework   # 777 temporal para que funcione dentro del contenedor
+chmod -R 777 bootstrap/cache storage/framework
 
-# 1. Composer inicial
-echo "📦 Instalando Composer..."
+# ─── Instalación de dependencias PHP ─────────────────────────────────────────
+{{USE_SAIL}}
+echo "📦 Instalando dependencias PHP con Composer (vía Docker)..."
 docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
@@ -32,65 +36,61 @@ docker run --rm \
     -e COMPOSER_HOME=/tmp/composer \
     laravelsail/php84-composer:latest \
     composer install --ignore-platform-reqs --no-interaction --no-scripts
-
-# 2. Instalar Sail (si es necesario)
-{{USE_SAIL}}
-echo "⛵ Instalando Laravel Sail..."
-docker run --rm \
-    -u "$(id -u):$(id -g)" \
-    -v "$(pwd):/var/www/html" \
-    -w /var/www/html \
-    -e COMPOSER_HOME=/tmp/composer \
-    laravelsail/php84-composer:latest \
-    composer require laravel/sail --dev --no-interaction
 {{/USE_SAIL}}
+{{!USE_SAIL}}
+echo "📦 Instalando dependencias PHP con Composer..."
+composer install --no-interaction
+{{/!USE_SAIL}}
 
-# 3. .env
-echo "📋 Copiando .env..."
+# ─── Archivo .env ─────────────────────────────────────────────────────────────
+echo "📋 Configurando .env..."
 cp -n .env.example .env 2>/dev/null || true
 
-# 4. Levantar contenedores (si usa Sail)
+# ─── Arranque de contenedores Docker ─────────────────────────────────────────
 {{USE_SAIL}}
-echo "🚀 Levantando contenedores (puede tardar 1-2 min la primera vez)..."
+echo "🐳 Levantando contenedores Sail (puede tardar 1-2 min la primera vez)..."
 ./vendor/bin/sail up -d --build
 
 sleep 12
 
-# 5. Config básica
-echo "🔑 Generando key y storage link..."
+echo "🔑 Generando app key y storage link..."
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan storage:link
 {{/USE_SAIL}}
+{{!USE_SAIL}}
+echo "🔑 Generando app key y storage link..."
+php artisan key:generate
+php artisan storage:link
+{{/!USE_SAIL}}
 
-# 6. Paquetes adicionales
+# ─── Paquetes adicionales ─────────────────────────────────────────────────────
 {{USE_LIVEWIRE}}
-echo "📦 Instalando Livewire..."
+echo "⚡ Instalando Livewire + Volt..."
 {{USE_SAIL}}
-./vendor/bin/sail composer require livewire/livewire --no-interaction
+./vendor/bin/sail composer require livewire/livewire livewire/volt --no-interaction
+./vendor/bin/sail artisan volt:install
 {{/USE_SAIL}}
+{{!USE_SAIL}}
+composer require livewire/livewire livewire/volt --no-interaction
+php artisan volt:install
+{{/!USE_SAIL}}
 {{/USE_LIVEWIRE}}
 
 {{USE_PEST}}
 echo "🧪 Instalando PEST..."
 {{USE_SAIL}}
 ./vendor/bin/sail composer require pestphp/pest --dev --no-interaction
-{{/USE_SAIL}}
-{{/USE_PEST}}
-
-{{USE_SAIL}}
-{{USE_PEST}}
 ./vendor/bin/sail artisan pest:install
-{{/USE_PEST}}
 {{/USE_SAIL}}
-
 {{!USE_SAIL}}
-{{USE_PEST}}
+composer require pestphp/pest --dev --no-interaction
 php artisan pest:install
+{{/!USE_SAIL}}
 {{/USE_PEST}}
-{{/USE_SAIL}}
 
-# 7. NPM + Tailwind (siempre se instala por defecto en Laravel)
-echo "📦 Instalando NPM + Tailwind..."
+# ─── Frontend (NPM + Tailwind) ────────────────────────────────────────────────
+{{USE_VITE}}
+echo "🎨 Instalando dependencias NPM..."
 {{USE_SAIL}}
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm install -D tailwindcss postcss autoprefixer
@@ -100,28 +100,37 @@ echo "📦 Instalando NPM + Tailwind..."
 npm install
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
-{{/USE_SAIL}}
+{{/!USE_SAIL}}
+{{/USE_VITE}}
 
+{{!USE_VITE}}
+echo "🎨 Instalando dependencias NPM (Webpack)..."
+{{USE_SAIL}}
+./vendor/bin/sail npm install
+{{/USE_SAIL}}
+{{!USE_SAIL}}
+npm install
+{{/!USE_SAIL}}
+{{/!USE_VITE}}
+
+# ─── Finalización ─────────────────────────────────────────────────────────────
 echo ""
 echo "✅ ¡Setup completado con éxito! 🎉"
 echo ""
 echo "🚀 Próximos pasos:"
-
 {{USE_SAIL}}
-echo "   1. ./vendor/bin/sail artisan migrate (si necesitas base de datos)"
-{{/USE_SAIL}}
-{{!USE_SAIL}}
-echo "   1. php artisan migrate (si necesitas base de datos)"
-{{/USE_SAIL}}
-
-echo "   2. {{USE_SAIL}}./vendor/bin/sail npm run dev{{/USE_SAIL}}{{!USE_SAIL}}npm run dev{{/USE_SAIL}}"
+echo "   1. ./vendor/bin/sail artisan migrate"
+echo "   2. ./vendor/bin/sail npm run dev"
 echo ""
 echo "💡 Para desarrollo continuo:"
-{{USE_SAIL}}
-echo "   - ./vendor/bin/sail artisan serve"
+echo "   - ./vendor/bin/sail up -d"
 echo "   - ./vendor/bin/sail npm run dev"
 {{/USE_SAIL}}
 {{!USE_SAIL}}
+echo "   1. php artisan migrate"
+echo "   2. npm run dev"
+echo ""
+echo "💡 Para desarrollo continuo:"
 echo "   - php artisan serve"
 echo "   - npm run dev"
-{{/USE_SAIL}}
+{{/!USE_SAIL}}
