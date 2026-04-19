@@ -1,0 +1,38 @@
+{
+    "name": "roldante05/laravel-scaffolder",
+    "description": "Laravel Project Scaffolder CLI Tool",
+    "type": "project",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "symfony/console": "^7.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.4"
+    },
+    "authors": [
+        {
+            "name": "roldante05",
+            "email": "danteroldan72@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Roldante05\\LaravelScaffolder\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/laravel-init"
+    ]
+}
