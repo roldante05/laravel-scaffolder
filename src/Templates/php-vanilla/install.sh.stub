@@ -1,0 +1,65 @@
+#!/bin/bash
+set -e
+
+echo "🚀 PHP Vanilla Project - Install script"
+echo "=========================================="
+
+# Check Docker
+if ! command -v docker &> /dev/null; then
+    echo "❌ Docker not found. Please install it first."
+    exit 1
+fi
+
+# Build and start containers
+echo "🐳 Starting containers..."
+docker compose up -d --build
+
+# Install composer dependencies
+echo "📦 Installing PHP dependencies..."
+docker compose exec app composer install
+
+{{USE_MYSQL}}
+{{USE_LOGIN}}
+echo "⏳ Waiting for MySQL to be ready..."
+sleep 10
+echo "🗄️ Creating users table..."
+docker compose exec app php -r "
+\$pdo = new PDO('mysql:host=mysql;dbname={{DB_DATABASE}}', 'user', 'password');
+\$pdo->exec('CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)');
+echo 'Users table created successfully';
+"
+{{/USE_LOGIN}}
+{{/USE_MYSQL}}
+
+{{USE_SQLITE}}
+{{USE_LOGIN}}
+echo "🗄️ Creating SQLite database and users table..."
+docker compose exec app php -r "
+\$pdo = new PDO('sqlite:/var/www/html/database.sqlite');
+\$pdo->exec('CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)');
+echo 'Users table created successfully';
+"
+docker compose exec app chmod 777 database.sqlite
+{{/USE_LOGIN}}
+{{/USE_SQLITE}}
+
+echo ""
+echo "✅ Setup completed successfully! 🎉"
+echo "🚀 Access your project at: http://localhost:8080"
+echo ""
+echo "💡 Useful commands:"
+echo "   - docker compose up -d (Start containers)"
+echo "   - docker compose down (Stop containers)"
+echo "   - docker compose exec app bash (Access container)"

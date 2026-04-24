@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - {{PROJECT_NAME}}</title>
+    {{USE_TAILWIND}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{/USE_TAILWIND}}
+    {{USE_BOOTSTRAP}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{/USE_BOOTSTRAP}}
+</head>
+<body class="{{USE_TAILWIND}}bg-gray-100{{/USE_TAILWIND}}">
+    
+    <?php require_once __DIR__ . '/nav.php'; ?>
+
+    <main class="{{USE_TAILWIND}}container mx-auto mt-10 p-6 bg-white rounded-lg shadow-md{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}container mt-5 py-5 bg-white border rounded shadow-sm{{/USE_BOOTSTRAP}}">
+        <h1 class="{{USE_TAILWIND}}text-2xl font-bold mb-4{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}h2 mb-4{{/USE_BOOTSTRAP}}">
+            Contact Us
+        </h1>
+        <p class="{{USE_TAILWIND}}text-gray-600 mb-6{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}text-muted mb-4{{/USE_BOOTSTRAP}}">
+            Have questions? Send us a message!
+        </p>
+
+        <form class="{{USE_TAILWIND}}space-y-4{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}row g-3{{/USE_BOOTSTRAP}}">
+            <div class="{{USE_BOOTSTRAP}}col-md-6{{/USE_BOOTSTRAP}}">
+                <label class="{{USE_TAILWIND}}block text-sm font-medium text-gray-700{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-label{{/USE_BOOTSTRAP}}">Name</label>
+                <input type="text" class="{{USE_TAILWIND}}mt-1 block w-full border rounded-md p-2 shadow-sm{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" placeholder="Your Name">
+            </div>
+            <div class="{{USE_BOOTSTRAP}}col-md-6{{/USE_BOOTSTRAP}}">
+                <label class="{{USE_TAILWIND}}block text-sm font-medium text-gray-700{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-label{{/USE_BOOTSTRAP}}">Email</label>
+                <input type="email" class="{{USE_TAILWIND}}mt-1 block w-full border rounded-md p-2 shadow-sm{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" placeholder="your@email.com">
+            </div>
+            <div class="{{USE_BOOTSTRAP}}col-12{{/USE_BOOTSTRAP}}">
+                <label class="{{USE_TAILWIND}}block text-sm font-medium text-gray-700{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-label{{/USE_BOOTSTRAP}}">Message</label>
+                <textarea rows="4" class="{{USE_TAILWIND}}mt-1 block w-full border rounded-md p-2 shadow-sm{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" placeholder="Write your message here..."></textarea>
+            </div>
+            <div class="{{USE_BOOTSTRAP}}col-12{{/USE_BOOTSTRAP}}">
+                <button type="button" class="{{USE_TAILWIND}}w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}btn btn-primary{{/USE_BOOTSTRAP}}">
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </main>
+
+    {{USE_BOOTSTRAP}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{/USE_BOOTSTRAP}}
+</body>
+</html>

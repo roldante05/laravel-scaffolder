@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    {{USE_MYSQL}}
+    depends_on:
+      - mysql
+    {{/USE_MYSQL}}
+    environment:
+      - DB_CONNECTION={{USE_MYSQL}}mysql{{/USE_MYSQL}}{{USE_SQLITE}}sqlite{{/USE_SQLITE}}{{!USE_MYSQL}}{{!USE_SQLITE}}none{{/!USE_SQLITE}}{{/!USE_MYSQL}}
+      - DB_HOST=mysql
+      - DB_DATABASE={{DB_DATABASE}}
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+
+  {{USE_MYSQL}}
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: {{DB_DATABASE}}
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  {{/USE_MYSQL}}
+
+{{USE_MYSQL}}
+volumes:
+  mysql_data:
+{{/USE_MYSQL}}

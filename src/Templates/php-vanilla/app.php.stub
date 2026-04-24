@@ -1,0 +1,20 @@
+<?php
+
+session_start();
+
+$view = $_GET['view'] ?? 'welcome';
+$form = $_GET['form'] ?? null;
+
+if ($form) {
+    $file = __DIR__ . '/form/' . $form . '.php';
+} else {
+    $file = __DIR__ . '/' . $view . '.php';
+}
+
+if (file_exists($file)) {
+    require_once $file;
+} else {
+    http_response_code(404);
+    echo "<h1>404 Not Found</h1>";
+    echo "<p>The page you are looking for does not exist.</p>";
+}
