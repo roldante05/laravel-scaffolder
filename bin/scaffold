@@ -12,5 +12,5 @@ use Symfony\Component\Console\Application;
 
 $application = new Application('Scaffolding Factory', '2.0.0');
 $application->add(new NewCommand());
-$application->setDefaultCommand('new', true); // Make it default so it runs without 'new' if needed
+$application->setDefaultCommand('new', false);
 $application->run();
