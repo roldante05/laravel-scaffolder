@@ -1,12 +1,16 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require __DIR__ . '/../vendor/autoload.php';
+} else {
+    require __DIR__ . '/../../../autoload.php';
+}
 
 use Roldante05\ScaffoldingFactory\Console\NewCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application('Scaffolding Factory', '2.0.0');
 $application->add(new NewCommand());
-$application->setDefaultCommand('new', true); // Make it default so it runs without 'new' if needed
+$application->setDefaultCommand('new', false);
 $application->run();
