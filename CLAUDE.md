@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for the Scaffolding Factory project.
 
 ## Development Commands
 
@@ -11,7 +11,8 @@ composer install
 
 ### Running the Tool
 ```bash
-php bin/laravel-init init <project-name>
+# General usage
+php bin/scaffold new <project-name>
 ```
 
 ### Running Tests
@@ -24,19 +25,17 @@ vendor/bin/pest
 ## Project Structure
 
 - `src/` - Main source code
-  - `Console/` - Console commands
-    - `LaravelInitCommand.php` - Main CLI command for Laravel project generation
-  - `Templates/` - Template files
-    - `install.sh.stub` - Template for installation script generation
+  - `Builders/` - Logic for different project types (Laravel, PHP Vanilla)
+  - `Console/` - Console commands (NewCommand.php)
+  - `Helpers/` - Utility classes (StubProcessor.php)
+  - `Templates/` - Stub templates for code generation
 - `bin/` - Executable scripts
-  - `laravel-init` - Entry point CLI command
+  - `scaffold` - Entry point CLI command
 
 ## How It Works
 
-The Laravel Scaffolder is a CLI tool that creates customized Laravel projects with interactive prompts for:
-- Laravel Sail (Docker) configuration
-- Livewire inclusion
-- Frontend choice (Vite/Webpack)
-- Testing framework (Pest/PHPUnit)
+Scaffolding Factory is a multi-purpose CLI tool that scaffolds:
+- **Laravel Projects**: Uses the latest Laravel version, supports Breeze, Jetstream, and modern Starter Kits with full Sail (Docker) integration.
+- **PHP Vanilla Projects**: Creates a custom structure with Docker (Apache/PHP 8.3), optional PDO-based Login Kit, and clean URL routing.
 
-It generates a base Laravel project via Composer, then applies selected customizations including installing packages, configuring services, and generating a customized `install.sh` script for final setup.
+The tool uses an interactive prompt system to collect user preferences and then builds the project by running shell commands and processing template stubs.

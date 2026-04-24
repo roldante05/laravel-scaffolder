@@ -1,19 +1,20 @@
 {
-    "name": "roldante05/laravel-scaffolder",
-    "description": "Laravel Project Scaffolder CLI Tool",
-    "type": "project",
+    "name": "roldante05/scaffolding-factory",
+    "description": "A powerful CLI tool to scaffold Laravel 13 and PHP Vanilla projects with Docker/Sail, auth kits, and modern frontend setup.",
+    "type": "library",
+    "license": "MIT",
     "require": {
-        "php": "^8.2",
-        "symfony/console": "^7.0",
-        "symfony/process": "^7.0"
+        "php": "^8.3",
+        "symfony/console": "^7.2",
+        "symfony/process": "^7.2"
     },
     "require-dev": {
         "pestphp/pest": "^3.0"
     },
     "authors": [
         {
-            "name": "roldante05",
-            "email": "danteroldan72@gmail.com"
+            "name": "Dante Roldan",
+            "email": "roldante05@gmail.com"
         }
     ],
     "minimum-stability": "stable",
@@ -24,7 +25,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Roldante05\\LaravelScaffolder\\": "src/"
+            "Roldante05\\ScaffoldingFactory\\": "src/"
         }
     },
     "autoload-dev": {
@@ -33,7 +34,7 @@
         }
     },
     "bin": [
-        "bin/laravel-init"
+        "bin/scaffold"
     ],
     "scripts": {
         "test": "pest"
