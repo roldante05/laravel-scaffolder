@@ -67,10 +67,13 @@ class PhpVanillaBuilder implements BuilderInterface
     {
         @mkdir($path, 0755, true);
         @mkdir($path . '/src', 0755, true);
+        @mkdir($path . '/src/controllers', 0755, true);
+        @mkdir($path . '/src/models', 0755, true);
+        @mkdir($path . '/src/views', 0755, true);
         @mkdir($path . '/src/resources', 0755, true);
-        
+
         if ($options['login']) {
-            @mkdir($path . '/src/form', 0755, true);
+            @mkdir($path . '/src/views/form', 0755, true);
         }
     }
 
@@ -94,12 +97,12 @@ class PhpVanillaBuilder implements BuilderInterface
         // Files to process
         $files = [
             'index.php.stub' => 'index.php',
-            'app.php.stub' => 'src/app.php',
-            'welcome.php.stub' => 'src/welcome.php',
-            'home.php.stub' => 'src/home.php',
-            'nav.php.stub' => 'src/nav.php',
-            'contact.php.stub' => 'src/contact.php',
-            'about.php.stub' => 'src/about.php',
+            'app.php.stub' => 'src/controllers/app.php',
+            'welcome.php.stub' => 'src/views/welcome.php',
+            'home.php.stub' => 'src/views/home.php',
+            'nav.php.stub' => 'src/views/nav.php',
+            'contact.php.stub' => 'src/views/contact.php',
+            'about.php.stub' => 'src/views/about.php',
             'htaccess.stub' => '.htaccess',
             'docker-compose.yml.stub' => 'docker-compose.yml',
             'Dockerfile.stub' => 'Dockerfile',
@@ -112,11 +115,11 @@ class PhpVanillaBuilder implements BuilderInterface
         }
 
         if ($options['login']) {
-            $files['form/login.php.stub'] = 'src/form/login.php';
-            $files['form/register.php.stub'] = 'src/form/register.php';
-            $files['form/authenticate.php.stub'] = 'src/form/authenticate.php';
-            $files['form/store.php.stub'] = 'src/form/store.php';
-            $files['form/logout.php.stub'] = 'src/form/logout.php';
+            $files['form/login.php.stub'] = 'src/views/form/login.php';
+            $files['form/register.php.stub'] = 'src/views/form/register.php';
+            $files['form/authenticate.php.stub'] = 'src/views/form/authenticate.php';
+            $files['form/store.php.stub'] = 'src/views/form/store.php';
+            $files['form/logout.php.stub'] = 'src/views/form/logout.php';
         }
 
         foreach ($files as $stub => $dest) {

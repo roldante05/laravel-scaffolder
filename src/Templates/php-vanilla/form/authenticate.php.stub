@@ -14,7 +14,7 @@ try {
     $pdo = new PDO($dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
     {{/USE_MYSQL}}
     {{USE_SQLITE}}
-    $pdo = new PDO('sqlite:' . __DIR__ . '/../../database.sqlite');
+    $pdo = new PDO('sqlite:' . __DIR__ . '/../../../database/database.sqlite');
     {{/USE_SQLITE}}
     
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

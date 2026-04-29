@@ -3,10 +3,16 @@ FROM php:8.3-apache
 # Enable mod_rewrite for clean URLs
 RUN a2enmod rewrite
 
-# Install PHP extensions
+# Install PHP extensions and Composer dependencies
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
+    zip \
+    unzip \
+    git \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 {{USE_MYSQL}}
 RUN docker-php-ext-install pdo pdo_mysql

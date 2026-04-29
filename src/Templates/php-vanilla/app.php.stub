@@ -6,9 +6,9 @@ $view = $_GET['view'] ?? 'welcome';
 $form = $_GET['form'] ?? null;
 
 if ($form) {
-    $file = __DIR__ . '/form/' . $form . '.php';
+    $file = __DIR__ . '/../views/form/' . $form . '.php';
 } else {
-    $file = __DIR__ . '/' . $view . '.php';
+    $file = __DIR__ . '/../views/' . $view . '.php';
 }
 
 if (file_exists($file)) {

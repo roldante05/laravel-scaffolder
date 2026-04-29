@@ -21,7 +21,7 @@ docker compose exec app composer install
 {{USE_MYSQL}}
 {{USE_LOGIN}}
 echo "⏳ Waiting for MySQL to be ready..."
-sleep 10
+sleep 15
 echo "🗄️ Creating users table..."
 docker compose exec app php -r "
 \$pdo = new PDO('mysql:host=mysql;dbname={{DB_DATABASE}}', 'user', 'password');
@@ -39,9 +39,11 @@ echo 'Users table created successfully';
 
 {{USE_SQLITE}}
 {{USE_LOGIN}}
-echo "🗄️ Creating SQLite database and users table..."
+echo "🗄️ Creating SQLite database directory and users table..."
+docker compose exec app mkdir -p database
+docker compose exec app chmod -R 777 database
 docker compose exec app php -r "
-\$pdo = new PDO('sqlite:/var/www/html/database.sqlite');
+\$pdo = new PDO('sqlite:/var/www/html/database/database.sqlite');
 \$pdo->exec('CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -51,7 +53,7 @@ docker compose exec app php -r "
 )');
 echo 'Users table created successfully';
 "
-docker compose exec app chmod 777 database.sqlite
+docker compose exec app chmod 666 database/database.sqlite
 {{/USE_LOGIN}}
 {{/USE_SQLITE}}
 
