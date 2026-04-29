@@ -56,6 +56,25 @@ This script will:
 4. Set up the database and environment variables.
 5. Provide the local access URL.
 
+## Raising projects locally
+
+### For Laravel projects:
+1. After running `./install.sh`, the script will provide the access URL (usually http://localhost)
+2. Laravel Sail containers will start automatically
+3. To stop containers: `./vendor/bin/sail down`
+4. To start containers again: `./vendor/bin/sail up -d`
+5. To run Artisan commands: `./vendor/bin/sail artisan [command]`
+6. To access the database: Use the credentials provided in the .env file
+
+### For PHP Vanilla projects:
+1. After running `./install.sh`, the script will provide the access URL (usually http://localhost)
+2. The custom Apache/PHP 8.3 container will start automatically
+3. To stop the container: `docker compose down`
+4. To start the container again: `docker compose up -d`
+5. Project files are served directly from the container
+6. To view logs: `docker compose logs -f`
+7. To access the database (if configured): Use the credentials in the .env file
+
 ## Requirements
 
 - PHP 8.3 or higher.
