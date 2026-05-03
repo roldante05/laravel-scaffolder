@@ -10,6 +10,7 @@ A powerful CLI tool designed to scaffold modern web projects in seconds. Choose 
     - **Laravel**: Breeze, Jetstream, or official Starter Kits (Livewire, React, Vue).
     - **Vanilla**: Optional Login Kit with PDO, including login, registration, and session management.
 - 🎨 **Modern Frontend**: Choice between **Tailwind CSS v4** or **Bootstrap 5**.
+- 🤖 **AI-Assisted Development**: Optional Laravel Boost installation for enhanced AI agent capabilities (MCP server, coding guidelines, and Laravel ecosystem documentation).
 - 🛠️ **Clean URLs**: Automatic `.htaccess` configuration for extension-less routing (e.g., `/home` instead of `home.php`).
 - ⚡ **Developer Friendly**: Generates a dynamic `install.sh` script so your team can set up the project with a single command.
 
@@ -29,7 +30,11 @@ Create a new project by running:
 scaffold new my-awesome-project
 ```
 
-The interactive wizard will guide you through the configuration options.
+The interactive wizard uses Laravel Prompts for a beautiful Terminal User Interface (TUI) experience:
+- Use **arrow keys** (↑ ↓) to navigate options
+- Press **Enter** to confirm your selection
+- Press **Esc** to go back to the previous step
+- Enjoy a clean, modern interface without numeric input
 
 ### 1. Laravel Flow
 - **Auth Kit**: Breeze, Jetstream, Starter Kits (Livewire, React, Vue), or None.

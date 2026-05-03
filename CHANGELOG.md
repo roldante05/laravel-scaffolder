@@ -8,3 +8,4 @@ All notable changes to this project will be documented in this file.
 - Initial release of Laravel Scaffolder CLI tool
 - Interactive project setup with options for Sail, Livewire, frontend, and testing framework
 - Customizable installation script generation
+- Laravel Boost integration for AI-assisted development (installs laravel/boost package and runs boost:install command)

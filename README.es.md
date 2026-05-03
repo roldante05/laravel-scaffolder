@@ -29,7 +29,10 @@ Crea un nuevo proyecto ejecutando:
 scaffold new mi-proyecto-asombroso
 ```
 
-El asistente interactivo te guiará a través de las opciones de configuración.
+El asistente interactivo te guiará a través de las opciones de configuración con una navegación mejorada:
+- Usa las **flechas** (↑ ↓) para seleccionar opciones
+- Presiona **Enter** para confirmar tu selección
+- Presiona **Esc** para volver al paso anterior
 
 ### 1. Flujo de Laravel
 - **Kit de Autenticación**: Breeze, Jetstream, Kits de Inicio Oficiales (Livewire, React, Vue), o Ninguno.
