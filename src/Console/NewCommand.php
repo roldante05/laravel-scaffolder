@@ -9,6 +9,15 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Laravel\Prompts\Prompt;
+use function Laravel\Prompts\intro;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\text;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\error;
+use function Laravel\Prompts\info;
 
 class NewCommand extends Command
 {
@@ -24,45 +33,81 @@ class NewCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->renderLogo($output);
         $projectName = $input->getArgument('name');
-        $helper = $this->getHelper('question');
 
-        $output->writeln([
-            '🚀 <info>Welcome to Scaffolding Factory!</info>',
-            '=====================================',
-        ]);
+        Prompt::setOutput($output);
+        intro('🚀 Welcome to Scaffolding Factory!');
 
-        // 1. Elegir tipo de proyecto
-        $question = new ChoiceQuestion(
-            'What type of project would you like to create?',
-            ['Laravel', 'PHP Vanilla'],
-            0
-        );
-        $projectType = $helper->ask($input, $output, $question);
-
-        // 2. Obtener Builder
-        $builder = $projectType === 'Laravel' 
-            ? new LaravelBuilder() 
-            : new PhpVanillaBuilder();
-
-        // 3. Preguntar opciones
-        $options = $builder->askOptions($input, $output, $helper);
-
-        // 4. Resumen
-        $output->writeln("\n<comment>Configuration Summary:</comment>");
-        $output->writeln("• Project Name: <info>$projectName</info>");
-        $output->writeln("• Type: <info>$projectType</info>");
-        foreach ($options as $key => $value) {
-            $output->writeln("• " . ucfirst($key) . ": <info>" . (is_bool($value) ? ($value ? 'Yes' : 'No') : $value) . "</info>");
+        if (!$projectName) {
+            $projectName = text(
+                label: 'What is the name of your project?',
+                placeholder: 'my-awesome-project',
+                required: true,
+                validate: fn(string $value) => trim($value) !== '' ? true : 'Project name cannot be empty.'
+            );
         }
 
-        $question = new ChoiceQuestion("\nDoes everything look correct?", ['Yes', 'No'], 0);
-        if ($helper->ask($input, $output, $question) === 'No') {
-            $output->writeln('<error>❌ Operation cancelled.</error>');
+        $projectType = select(
+            label: 'What type of project would you like to create?',
+            options: ['Laravel', 'PHP Vanilla'],
+            default: 'Laravel'
+        );
+
+        $builder = $projectType === 'Laravel'
+            ? new LaravelBuilder()
+            : new PhpVanillaBuilder();
+
+        $options = $builder->askOptions($input, $output, null);
+
+        if (isset($options['cancelled']) && $options['cancelled'] === true) {
+            error('❌ Operation cancelled.');
             return Command::FAILURE;
         }
 
-        // 5. Ejecutar
+        // Summary
+        $summaryLines = [
+            "Project Name: $projectName",
+            "Type: $projectType",
+        ];
+        foreach ($options as $key => $value) {
+            if ($key === 'cancelled')
+                continue;
+            $displayValue = is_bool($value) ? ($value ? 'Yes' : 'No') : $value;
+            $summaryLines[] = ucfirst($key) . ": $displayValue";
+        }
+
+        note(implode("\n", $summaryLines), 'Configuration Summary');
+
+        if (!confirm('Does everything look correct?', true)) {
+            error('❌ Operation cancelled.');
+            return Command::FAILURE;
+        }
+
         return $builder->build($projectName, $options, $output);
+    }
+
+    /**
+     * Render the Scaffolding Factory logo.
+     */
+    protected function renderLogo(OutputInterface $output): void
+    {
+        $output->writeln([
+            '',
+            ' <fg=white> ███████╗ ██████╗ █████╗ ███████╗███████╗ ██████╗ ██╗     ██████╗ ██╗███╗   ██╗ ██████╗ </>',
+            ' <fg=white> ██╔════╝██╔════╝██╔══██╗██╔════╝██╔════╝██╔═══██╗██║     ██╔══██╗██║████╗  ██║██╔════╝ </>',
+            ' <fg=white> ███████╗██║     ███████║█████╗  █████╗  ██║   ██║██║     ██║  ██║██║██╔██╗ ██║██║  ███╗</>',
+            ' <fg=red> ╚════██║██║     ██╔══██║██╔══╝  ██╔══╝  ██║   ██║██║     ██║  ██║██║██║╚██╗██║██║   ██║</>',
+            ' <fg=red> ███████║╚██████╗██║  ██║██║     ██║     ╚██████╔╝███████╗██████╔╝██║██║ ╚████║╚██████╔╝</>',
+            ' <fg=red> ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝      ╚═════╝ ╚══════╝╚═════╝ ╚═╝╚═╝  ╚═══╝ ╚═════╝ </>',
+            ' <fg=red>                                                                                    </>',
+            ' <fg=red>              ███████╗ █████╗  ██████╗████████╗ ██████╗ ██████╗ ██╗   ██╗           </>',
+            ' <fg=red>              ██╔════╝██╔══██╗██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗╚██╗ ██╔╝           </>',
+            ' <fg=red>              █████╗  ███████║██║        ██║   ██║   ██║██████╔╝ ╚████╔╝            </>',
+            ' <fg=white>              ██╔══╝  ██╔══██║██║        ██║   ██║   ██║██╔══██╗  ╚██╔╝             </>',
+            ' <fg=white>              ██║     ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║   ██║              </>',
+            ' <fg=white>              ╚═╝     ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝              </>',
+            '',
+        ]);
     }
 }
