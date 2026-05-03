@@ -7,6 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Laravel\Prompts\Prompt;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\info;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -16,29 +20,36 @@ class PhpVanillaBuilder implements BuilderInterface
     {
         $options = [];
 
-        // 1. Base de datos
-        $question = new ChoiceQuestion(
-            'Which database would you like to use?',
-            ['mysql', 'sqlite', 'none'],
-            0
+        info('💾 Database Configuration');
+        $options['database'] = select(
+            label: 'Which database would you like to use?',
+            options: [
+                'mysql' => 'MySQL',
+                'sqlite' => 'SQLite (Zero-config)',
+                'none' => 'None (No database)'
+            ],
+            default: 'mysql'
         );
-        $options['database'] = $helper->ask($input, $output, $question);
 
-        // 2. Kit de Login (solo si hay DB)
         if ($options['database'] !== 'none') {
-            $question = new ConfirmationQuestion('Would you like to include a Login Kit? [y/N] ', false);
-            $options['login'] = $helper->ask($input, $output, $question);
+            info('🔐 Authentication System');
+            $options['login'] = confirm(
+                label: 'Would you like to include a Login Kit?',
+                default: false
+            );
         } else {
             $options['login'] = false;
         }
 
-        // 3. Framework CSS
-        $question = new ChoiceQuestion(
-            'Which CSS framework would you like to use?',
-            ['Tailwind CSS', 'Bootstrap'],
-            0
+        info('🎨 CSS Framework Selection');
+        $options['css'] = select(
+            label: 'Which CSS framework would you like to use?',
+            options: [
+                'Tailwind CSS' => 'Tailwind CSS',
+                'Bootstrap' => 'Bootstrap'
+            ],
+            default: 'Tailwind CSS'
         );
-        $options['css'] = $helper->ask($input, $output, $question);
 
         return $options;
     }
@@ -80,7 +91,7 @@ class PhpVanillaBuilder implements BuilderInterface
     protected function generateFiles(string $path, array $options): void
     {
         $templatesDir = __DIR__ . '/../Templates/php-vanilla';
-        
+
         $tags = [
             'USE_MYSQL' => $options['database'] === 'mysql',
             'USE_SQLITE' => $options['database'] === 'sqlite',
@@ -128,7 +139,7 @@ class PhpVanillaBuilder implements BuilderInterface
                 $content = file_get_contents($stubFile);
                 $processed = StubProcessor::process($content, $variables, $tags);
                 file_put_contents($path . '/' . $dest, $processed);
-                
+
                 if (str_ends_with($dest, '.sh')) {
                     chmod($path . '/' . $dest, 0755);
                 }
