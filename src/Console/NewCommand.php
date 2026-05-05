@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Roldante05\ScaffoldingFactory\Console;
 
 use Roldante05\ScaffoldingFactory\Builders\LaravelBuilder;
 use Roldante05\ScaffoldingFactory\Builders\PhpVanillaBuilder;
+use Roldante05\ScaffoldingFactory\Interactions\LaravelInteractionHandler;
+use Roldante05\ScaffoldingFactory\Interactions\PhpVanillaInteractionHandler;
+use Roldante05\ScaffoldingFactory\DTOs\LaravelOptions;
+use Roldante05\ScaffoldingFactory\DTOs\PhpVanillaOptions;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Laravel\Prompts\Prompt;
 use function Laravel\Prompts\intro;
 use function Laravel\Prompts\select;
@@ -17,18 +21,15 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\text;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
-use function Laravel\Prompts\info;
 
 class NewCommand extends Command
 {
-    protected static $defaultName = 'new';
-
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('new')
             ->setDescription('Create a new project (Laravel or PHP Vanilla)')
-            ->addArgument('name', InputArgument::REQUIRED, 'The name of the project');
+            ->addArgument('name', InputArgument::OPTIONAL, 'The name of the project');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,6 +47,7 @@ class NewCommand extends Command
                 required: true,
                 validate: fn(string $value) => trim($value) !== '' ? true : 'Project name cannot be empty.'
             );
+            $input->setArgument('name', $projectName);
         }
 
         $projectType = select(
@@ -54,27 +56,31 @@ class NewCommand extends Command
             default: 'Laravel'
         );
 
+        $handler = $projectType === 'Laravel'
+            ? new LaravelInteractionHandler()
+            : new PhpVanillaInteractionHandler();
+
         $builder = $projectType === 'Laravel'
             ? new LaravelBuilder()
             : new PhpVanillaBuilder();
 
-        $options = $builder->askOptions($input, $output, null);
-
-        if (isset($options['cancelled']) && $options['cancelled'] === true) {
-            error('❌ Operation cancelled.');
-            return Command::FAILURE;
-        }
+        $options = $handler->handle($input, $output);
 
         // Summary
         $summaryLines = [
             "Project Name: $projectName",
             "Type: $projectType",
         ];
-        foreach ($options as $key => $value) {
-            if ($key === 'cancelled')
-                continue;
-            $displayValue = is_bool($value) ? ($value ? 'Yes' : 'No') : $value;
-            $summaryLines[] = ucfirst($key) . ": $displayValue";
+
+        if ($options instanceof LaravelOptions) {
+            $summaryLines[] = "Starter Kit: " . ($options->wantKit ? $options->kit : 'None');
+            $summaryLines[] = "Stack: " . $options->stack;
+            $summaryLines[] = "Database: " . $options->database;
+            $summaryLines[] = "Boost: " . ($options->withBoost ? 'Yes' : 'No');
+        } elseif ($options instanceof PhpVanillaOptions) {
+            $summaryLines[] = "Database: " . $options->database;
+            $summaryLines[] = "Login Kit: " . ($options->login ? 'Yes' : 'No');
+            $summaryLines[] = "CSS: " . $options->css;
         }
 
         note(implode("\n", $summaryLines), 'Configuration Summary');
@@ -87,9 +93,6 @@ class NewCommand extends Command
         return $builder->build($projectName, $options, $output);
     }
 
-    /**
-     * Render the Scaffolding Factory logo.
-     */
     protected function renderLogo(OutputInterface $output): void
     {
         $output->writeln([
