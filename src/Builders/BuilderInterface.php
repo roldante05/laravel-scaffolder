@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Roldante05\ScaffoldingFactory\Builders;
 
 use Symfony\Component\Console\Input\InputInterface;
