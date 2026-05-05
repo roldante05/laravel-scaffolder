@@ -71,7 +71,7 @@ run_step "Finalizando instalación de Jetstream" ./vendor/bin/sail artisan jetst
 {{/USE_JETSTREAM}}
 
 run_step "Ejecutando migraciones de base de datos" ./vendor/bin/sail artisan migrate --force
-run_step "Instalando dependencias de frontend (NPM)" ./vendor/bin/sail npm install
+run_step "Instalando dependencias de frontend (NPM)" ./vendor/bin/sail npm install --legacy-peer-deps
 run_step "Compilando assets de frontend" ./vendor/bin/sail npm run build
 
 echo -e "${BLUE}===============================================${NC}"
