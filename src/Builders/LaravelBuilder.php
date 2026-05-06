@@ -20,72 +20,65 @@ class LaravelBuilder implements BuilderInterface
         /** @var LaravelOptions $options */
         $projectPath = getcwd() . DIRECTORY_SEPARATOR . $projectName;
 
-        // Create sections if possible
-        $headerSection = $output instanceof ConsoleOutputInterface ? $output->section() : $output;
-        $detailSection = $output instanceof ConsoleOutputInterface ? $output->section() : $output;
-
-        // Show the Laravel logo in the header section
-        $headerSection->writeln('');
-        $headerSection->writeln('   <fg=red> ██╗       █████╗  ██████╗   █████╗  ██╗   ██╗ ███████╗ ██╗</>');
-        $headerSection->writeln('   <fg=red> ██║      ██╔══██╗ ██╔══██╗ ██╔══██╗ ██║   ██║ ██╔════╝ ██║</>');
-        $headerSection->writeln('   <fg=red> ██║      ███████║ ██████╔╝ ███████║ ██║   ██║ █████╗   ██║</>');
-        $headerSection->writeln('   <fg=red> ██║      ██╔══██║ ██╔══██╗ ██╔══██║ ╚██╗ ██╔╝ ██╔══╝   ██║</>');
-        $headerSection->writeln('   <fg=red> ███████╗ ██║  ██║ ██║  ██║ ██║  ██║  ╚████╔╝  ███████╗ ███████╗</>');
-        $headerSection->writeln('   <fg=red> ╚══════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝   ╚═══╝   ╚══════╝ ╚══════╝</>');
-        $headerSection->writeln('');
-
         try {
             // 1. Create Laravel project using official installer
-            $headerSection->writeln('<info>📦 Creating Laravel project...</info>');
-            $this->createLaravelProjectWithInstaller($projectName, $detailSection);
-            $detailSection->clear();
-            $headerSection->overwrite('<info>📦 Laravel project created ✅</info>');
+            $output->writeln(' • Scaffolding project');
+            $this->createLaravelProjectWithInstaller($projectName, $output);
+
+            // Create sections for a persistent dashboard experience for the remaining steps
+            // historySection: Keeps the list of completed steps (append-only)
+            // activeSection: Shows the current task and technical logs (transient)
+            $historySection = $output instanceof ConsoleOutputInterface ? $output->section() : $output;
+            $activeSection = $output instanceof ConsoleOutputInterface ? $output->section() : $output;
+
+            $historySection->writeln('   <fg=green>✔</> Laravel project created');
 
             // 2. Ensure resources/js/bootstrap.js exists
             $this->ensureBootstrapJs($projectPath);
 
             // 3. Install Sail
-            $headerSection->writeln('<info>⛵ Configuring Laravel Sail...</info>');
-            $this->runProcess(['composer', 'require', 'laravel/sail', '--dev', '--no-interaction', '--quiet'], $projectPath, $detailSection);
-            
-            $this->installSail($projectPath, $options, $headerSection, $detailSection);
-            $detailSection->clear();
-            $headerSection->overwrite('<info>⛵ Laravel Sail configured ✅</info>');
+            $activeSection->writeln('   • Configuring Laravel Sail');
+            $this->runProcess(['composer', 'require', 'laravel/sail', '--dev', '--no-interaction', '--quiet'], $projectPath, $activeSection, false, true);
+
+            $this->installSail($projectPath, $options, $activeSection, $activeSection);
+            $activeSection->clear();
+            $historySection->writeln('   <fg=green>✔</> Laravel Sail configured');
 
             // 4. Install Auth Kit
-            $this->installAuthKit($projectPath, $options, $headerSection, $detailSection);
-            $detailSection->clear();
+            $this->installAuthKit($projectPath, $options, $historySection, $activeSection);
 
             // 5. Install Laravel Boost
             if ($options->withBoost) {
-                $headerSection->writeln('<info>🚀 Installing Laravel Boost...</info>');
-                $this->installBoost($projectPath, $headerSection, $detailSection);
-                $detailSection->clear();
-                $headerSection->overwrite('<info>🚀 Laravel Boost installed ✅</info>');
+                $activeSection->writeln('   • Installing Laravel Boost');
+                $this->installBoost($projectPath, $activeSection, $activeSection);
+                $activeSection->clear();
+                $historySection->writeln('   <fg=green>✔</> Laravel Boost installed');
             }
 
             // 6. Set database connection
-            $headerSection->writeln('<info>🗄️ Setting database connection...</info>');
-            $this->setDatabaseConnection($projectPath, $options->database, $headerSection);
-            $headerSection->overwrite('<info>🗄️ Database connection set to ' . $options->database . ' ✅</info>');
+            $activeSection->writeln('   • Setting database connection');
+            $this->setDatabaseConnection($projectPath, $options->database, $activeSection);
+            $activeSection->clear();
+            $historySection->writeln('   <fg=green>✔</> Database connection set to ' . $options->database);
 
             // 7. Generate install.sh
-            $headerSection->writeln('<info>📝 Generating installation script...</info>');
-            $this->generateInstallScript($projectPath, $options, $headerSection);
-            $headerSection->overwrite('<info>📝 Installation script generated ✅</info>');
+            $activeSection->writeln('   • Generating installation script');
+            $this->generateInstallScript($projectPath, $options, $activeSection);
+            $activeSection->clear();
+            $historySection->writeln('   <fg=green>✔</> Installation script generated');
 
             // Fix node_modules permissions
             $nodeModulesPath = $projectPath . DIRECTORY_SEPARATOR . 'node_modules';
             if (is_dir($nodeModulesPath)) {
-                $this->runProcess(['chmod', '-R', 'a+rX', 'node_modules'], $projectPath, $detailSection);
+                $this->runProcess(['chmod', '-R', 'a+rX', 'node_modules'], $projectPath, $activeSection);
             }
 
-            $detailSection->clear();
-            $headerSection->writeln('');
-            $headerSection->writeln('<info>🎉 Project generated successfully!</info>');
-            $headerSection->writeln('<info>📝 Next steps:</info>');
-            $headerSection->writeln('   1. cd ' . $projectName);
-            $headerSection->writeln('   2. ./install.sh');
+            $activeSection->clear();
+            $activeSection->writeln('');
+            $activeSection->writeln('<info>🎉 Project generated successfully!</info>');
+            $activeSection->writeln('<info>📝 Next steps:</info>');
+            $activeSection->writeln('   1. cd ' . $projectName);
+            $activeSection->writeln('   2. ./install.sh');
 
             return 0;
         } catch (\Exception $e) {
@@ -107,7 +100,7 @@ class LaravelBuilder implements BuilderInterface
         }
     }
 
-    protected function installSail(string $projectPath, LaravelOptions $options, OutputInterface $headerSection, OutputInterface $detailSection): void
+    protected function installSail(string $projectPath, LaravelOptions $options, OutputInterface $activeSection, OutputInterface $detailSection): void
     {
         $database = $options->database;
         $sailServices = [];
@@ -124,84 +117,80 @@ class LaravelBuilder implements BuilderInterface
             $sailCommand[] = '--with=';
         }
 
-        $this->runProcess($sailCommand, $projectPath, $detailSection);
-        $this->customizeComposeFile($projectPath, $database, $headerSection);
+        $this->runProcess($sailCommand, $projectPath, $activeSection, false, true);
+        $this->customizeComposeFile($projectPath, $database, $activeSection);
     }
 
-    protected function installAuthKit(string $projectPath, LaravelOptions $options, OutputInterface $headerSection, OutputInterface $detailSection): void
+    protected function installAuthKit(string $projectPath, LaravelOptions $options, OutputInterface $historySection, OutputInterface $activeSection): void
     {
         $kit = $options->kit;
         if ($kit === 'Breeze' || $kit === 'Official Starter Kit (2026)') {
             $kitName = $kit === 'Breeze' ? 'Laravel Breeze' : 'Official Starter Kit (2026)';
-            $headerSection->writeln("<info>🍃 Ensuring {$kitName} is installed...</info>");
+            $activeSection->writeln("   • Ensuring {$kitName} is installed");
 
             $breezePath = $projectPath . '/vendor/laravel/breeze';
             if (!is_dir($breezePath)) {
-                $this->runProcess(['composer', 'require', 'laravel/breeze', '--dev', '--no-interaction', '--quiet'], $projectPath, $detailSection);
+                $this->runProcess(['composer', 'require', 'laravel/breeze', '--dev', '--no-interaction', '--quiet'], $projectPath, $activeSection, false, true);
                 $breezeArgs = [$options->stack];
 
                 // Set env to avoid NPM ERESOLVE issues during artisan's internal npm install
                 $process = new Process(array_merge(['php', 'artisan', 'breeze:install'], $breezeArgs), $projectPath, ['NPM_CONFIG_LEGACY_PEER_DEPS' => 'true']);
                 $process->setTimeout(null);
-                $process->run(function ($type, $line) use ($detailSection) {
-                    if ($detailSection instanceof ConsoleSectionOutput) {
-                        $cleanLine = trim($line);
-                        if (!empty($cleanLine)) {
-                            $detailSection->overwrite('  <fg=gray>» ' . $cleanLine . '</>');
-                        }
-                    } else {
-                        $detailSection->write($line);
+                $process->run(function ($type, $line) use ($activeSection) {
+                    if (!$activeSection instanceof ConsoleSectionOutput) {
+                        $activeSection->write($line);
                     }
                 });
 
                 if (!$process->isSuccessful()) {
-                    $headerSection->writeln('<warning>⚠️ Breeze install finished with some warnings (likely NPM). These will be fixed in install.sh</warning>');
+                    $historySection->writeln('   <fg=yellow>⚠</> Breeze install finished with some warnings (likely NPM)');
                 } else {
-                    $headerSection->overwrite("<info>🍃 {$kitName} installed ✅</info>");
+                    $activeSection->clear();
+                    $historySection->writeln("   <fg=green>✔</> {$kitName} installed");
                 }
             } else {
-                $headerSection->overwrite("<info>🍃 {$kitName} already installed ✅</info>");
+                $activeSection->clear();
+                $historySection->writeln("   <fg=green>✔</> {$kitName} already installed");
             }
 
-            $this->fixJsDependencies($projectPath, $options->stack, $headerSection);
+            $this->fixJsDependencies($projectPath, $options->stack, $historySection);
         } elseif ($kit === 'Jetstream') {
-            $headerSection->writeln('<info>🚀 Ensuring Laravel Jetstream is installed...</info>');
+            $activeSection->writeln('   • Ensuring Laravel Jetstream is installed');
 
             $jetstreamPath = $projectPath . '/vendor/laravel/jetstream';
             if (!is_dir($jetstreamPath)) {
-                $this->runProcess(['composer', 'require', 'laravel/jetstream', '--no-interaction', '--quiet'], $projectPath, $detailSection);
+                $this->runProcess(['composer', 'require', 'laravel/jetstream', '--no-interaction', '--quiet'], $projectPath, $activeSection, false, true);
 
                 // Set env to avoid NPM ERESOLVE issues during artisan's internal npm install
                 $process = new Process(['php', 'artisan', 'jetstream:install', $options->stack, '--no-interaction'], $projectPath, ['NPM_CONFIG_LEGACY_PEER_DEPS' => 'true']);
                 $process->setTimeout(null);
-                $process->run(function ($type, $line) use ($detailSection) {
-                    if ($detailSection instanceof ConsoleSectionOutput) {
-                        $cleanLine = trim($line);
-                        if (!empty($cleanLine)) {
-                            $detailSection->overwrite('  <fg=gray>» ' . $cleanLine . '</>');
-                        }
-                    } else {
-                        $detailSection->write($line);
+                $process->run(function ($type, $line) use ($activeSection) {
+                    if (!$activeSection instanceof ConsoleSectionOutput) {
+                        $activeSection->write($line);
                     }
                 });
 
                 if (!$process->isSuccessful()) {
-                    $headerSection->writeln('<warning>⚠️ Jetstream install finished with some warnings (likely NPM). These will be fixed in install.sh</warning>');
+                    $historySection->writeln('   <fg=yellow>⚠</> Jetstream install finished with some warnings (likely NPM)');
+                } else {
+                    $activeSection->clear();
+                    $historySection->writeln('   <fg=green>✔</> Laravel Jetstream installed');
                 }
             } else {
-                $headerSection->writeln('<info>🚀 Laravel Jetstream already installed, skipping...</info>');
+                $activeSection->clear();
+                $historySection->writeln('   <fg=green>✔</> Laravel Jetstream already installed');
             }
 
-            $this->fixJsDependencies($projectPath, $options->stack, $headerSection);
+            $this->fixJsDependencies($projectPath, $options->stack, $historySection);
         }
     }
 
     protected function installBoost(string $projectPath, OutputInterface $headerSection, OutputInterface $detailSection): void
     {
-        $headerSection->writeln('<info>🚀 Installing Laravel Boost for AI assisted coding...</info>');
+        $headerSection->writeln('   • Installing Laravel Boost for AI assisted coding');
         try {
-            $this->runProcess(['composer', 'require', 'laravel/boost', '--dev', '--no-interaction', '--quiet'], $projectPath, $detailSection);
-            $this->runProcess(['php', 'artisan', 'boost:install'], $projectPath, $detailSection);
+            $this->runProcess(['composer', 'require', 'laravel/boost', '--dev', '--no-interaction', '--quiet'], $projectPath, $detailSection, false, true);
+            $this->runProcess(['php', 'artisan', 'boost:install'], $projectPath, $detailSection, false, true);
         } catch (\Exception $e) {
             $headerSection->writeln('<warning>⚠️ Laravel Boost installation failed. Continuing without it...</warning>');
         }
@@ -209,15 +198,34 @@ class LaravelBuilder implements BuilderInterface
 
     protected function createLaravelProjectWithInstaller(string $projectName, OutputInterface $output): void
     {
-        $process = new Process(['laravel', '--version']);
-        $process->run();
-        $laravelInstalled = $process->isSuccessful();
+        $output->writeln('   • Checking for Laravel installer updates');
+        $process = new Process(['composer', 'global', 'require', 'laravel/installer']);
+        $process->setTimeout(null);
 
-        if (!$laravelInstalled) {
-            $output->writeln('<info>📦 Installing Laravel installer globally...</info>');
-            $this->runProcess(['composer', 'global', 'require', 'laravel/installer'], null, $output);
-            putenv('PATH=' . getenv('HOME') . '/.composer/vendor/bin:' . getenv('PATH'));
-        }
+        $process->run(function ($type, $line) use ($output) {
+            $isNoise = (
+                strpos($line, 'Loading composer repositories') !== false ||
+                strpos($line, 'Updating dependencies') !== false ||
+                strpos($line, 'Installing dependencies') !== false ||
+                strpos($line, 'Writing lock file') !== false ||
+                strpos($line, 'Generating autoload files') !== false ||
+                strpos($line, 'Nothing to install, update or remove') !== false ||
+                strpos($line, 'packages you are using are looking for funding') !== false ||
+                strpos($line, 'Use the `composer fund` command') !== false ||
+                strpos($line, 'No security vulnerability advisories found') !== false ||
+                strpos($line, 'Using version') !== false ||
+                strpos($line, './composer.json has been updated') !== false ||
+                strpos($line, 'Running composer update') !== false ||
+                strpos($line, 'Changed current directory') !== false
+            );
+
+            if (!$isNoise && trim($line) !== '') {
+                $output->writeln('      <fg=gray>» ' . trim($line) . '</>');
+            }
+        });
+
+        $home = getenv('HOME');
+        putenv("PATH={$home}/.config/composer/vendor/bin:{$home}/.composer/vendor/bin:" . getenv('PATH'));
 
         $process = new Process(['laravel', 'new', $projectName, '--no-interaction']);
         $process->setTimeout(null);
@@ -237,7 +245,7 @@ class LaravelBuilder implements BuilderInterface
         }
     }
 
-    protected function runProcess(array $command, ?string $cwd, OutputInterface $output, bool $returnStatus = false): bool
+    protected function runProcess(array $command, ?string $cwd, OutputInterface $output, bool $returnStatus = false, bool $silent = false): bool
     {
         $process = new Process($command);
         if ($cwd) {
@@ -249,7 +257,10 @@ class LaravelBuilder implements BuilderInterface
         $isMigrationCommand = (strpos($commandString, 'migrate') !== false && strpos($commandString, 'artisan') !== false);
         $isLaravelNew = (isset($command[0]) && $command[0] === 'laravel' && $command[1] === 'new');
 
-        $process->run(function ($type, $line) use ($output, $isMigrationCommand, $isLaravelNew) {
+        $process->run(function ($type, $line) use ($output, $isMigrationCommand, $isLaravelNew, $silent) {
+            if ($silent) {
+                return;
+            }
             if ($isLaravelNew && (strpos($line, 'database migrations') !== false || strpos($line, 'Error output:') !== false || strpos($line, 'artisan migrate') !== false)) {
                 return;
             }
@@ -360,7 +371,7 @@ class LaravelBuilder implements BuilderInterface
             }
             $packageJson['overrides']['vite'] = '$vite';
 
-            $output->writeln('<info>🔧 Adjusted vite version and added overrides to resolve dependency conflicts</info>');
+            $output->writeln('   <fg=green>✔</> Adjusted vite version and added overrides to resolve dependency conflicts');
         }
 
         file_put_contents($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
