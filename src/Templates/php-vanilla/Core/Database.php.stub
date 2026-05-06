@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+use PDO;
+use PDOException;
+
+class Database
+{
+    private static ?PDO $instance = null;
+
+    public static function getInstance(): PDO
+    {
+        if (self::$instance === null) {
+            try {
+                {{USE_MYSQL}}
+                $dsn = "mysql:host=" . getenv('DB_HOST') . ";dbname=" . getenv('DB_DATABASE');
+                self::$instance = new PDO($dsn, getenv('DB_USERNAME'), getenv('DB_PASSWORD'), [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+                {{/USE_MYSQL}}
+                {{USE_SQLITE}}
+                $dsn = "sqlite:" . __DIR__ . "/../../database.sqlite";
+                self::$instance = new PDO($dsn, null, null, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+                {{/USE_SQLITE}}
+            } catch (PDOException $e) {
+                die("Connection failed: " . $e->getMessage());
+            }
+        }
+
+        return self::$instance;
+    }
+}

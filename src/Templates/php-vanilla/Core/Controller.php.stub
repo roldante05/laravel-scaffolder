@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+abstract class Controller
+{
+    protected function render(string $view, array $data = []): void
+    {
+        extract($data);
+        $viewFile = __DIR__ . "/../Views/$view.php";
+        
+        if (file_exists($viewFile)) {
+            require_once $viewFile;
+        } else {
+            throw new \Exception("View $view not found.");
+        }
+    }
+
+    protected function redirect(string $url): void
+    {
+        header("Location: $url");
+        exit;
+    }
+}

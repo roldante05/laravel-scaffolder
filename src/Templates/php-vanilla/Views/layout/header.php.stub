@@ -1,0 +1,23 @@
+<header class="bg-white shadow-sm p-4 flex justify-between items-center border-b border-slate-100">
+    <h2 class="text-xl font-semibold text-slate-800">
+        <?= match($_SERVER['REQUEST_URI']) {
+            '/home' => 'Resumen General',
+            '/about' => 'Sobre Nosotros',
+            '/contact' => 'Contacto',
+            default => 'Dashboard'
+        } ?>
+    </h2>
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
+            <span class="text-slate-600 text-sm italic">Hola, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Invitado') ?></span>
+            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold border border-indigo-200">
+                <?= strtoupper(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
+            </div>
+        </div>
+        <a href="/logout" class="text-slate-400 hover:text-red-500 transition-colors" title="Cerrar Sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+        </a>
+    </div>
+</header>

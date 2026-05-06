@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - {{PROJECT_NAME}}</title>
+    {{USE_TAILWIND}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{/USE_TAILWIND}}
+    {{USE_BOOTSTRAP}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{/USE_BOOTSTRAP}}
+</head>
+<body class="{{USE_TAILWIND}}bg-slate-50 text-slate-900 antialiased flex items-center justify-center min-h-screen px-4 py-12{{/USE_TAILWIND}}">
+    <div class="{{USE_TAILWIND}}max-w-md w-full bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}container mt-5{{/USE_BOOTSTRAP}}">
+        <div class="text-center mb-10">
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+                <span class="text-white text-xl font-bold">P</span>
+            </div>
+            <h2 class="{{USE_TAILWIND}}text-3xl font-extrabold text-slate-900 tracking-tight{{/USE_TAILWIND}}">Crear cuenta</h2>
+            <p class="text-slate-500 mt-2">Únete a la plataforma en pocos segundos</p>
+        </div>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="{{USE_TAILWIND}}bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm font-medium border border-red-100 flex items-center gap-3{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}alert alert-danger{{/USE_BOOTSTRAP}}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="/register" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Nombre Completo</label>
+                <input type="text" name="name" 
+                    class="{{USE_TAILWIND}}w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" 
+                    placeholder="Juan Pérez" required>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Correo Electrónico</label>
+                <input type="email" name="email" 
+                    class="{{USE_TAILWIND}}w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" 
+                    placeholder="nombre@ejemplo.com" required>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">Contraseña</label>
+                <input type="password" name="password" 
+                    class="{{USE_TAILWIND}}w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}form-control{{/USE_BOOTSTRAP}}" 
+                    placeholder="••••••••" required>
+            </div>
+            <button type="submit" 
+                class="{{USE_TAILWIND}}w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-200{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}btn btn-primary w-100{{/USE_BOOTSTRAP}}">
+                Empezar Ahora
+            </button>
+        </form>
+        <p class="mt-8 text-center text-sm text-slate-500">
+            ¿Ya tienes una cuenta? <a href="/login" class="text-indigo-600 font-bold hover:underline">Inicia sesión</a>
+        </p>
+    </div>
+</body>
+</html>

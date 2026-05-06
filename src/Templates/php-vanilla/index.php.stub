@@ -1,4 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/src/controllers/app.php';
+
+use App\Core\Router;
+
+session_start();
+
+$router = new Router();
+
+// Routes
+$router->add('GET', '/', 'HomeController@index');
+$router->add('GET', '/about', 'HomeController@about');
+$router->add('GET', '/contact', 'HomeController@contact');
+$router->add('GET', '/home', 'HomeController@home');
+
+{{USE_LOGIN}}
+$router->add('GET', '/login', 'AuthController@showLogin');
+$router->add('POST', '/login', 'AuthController@login');
+$router->add('GET', '/register', 'AuthController@showRegister');
+$router->add('POST', '/register', 'AuthController@register');
+$router->add('GET', '/logout', 'AuthController@logout');
+{{/USE_LOGIN}}
+
+$router->dispatch();

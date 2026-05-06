@@ -1,0 +1,14 @@
+<!-- Sidebar -->
+<aside class="w-64 bg-slate-900 text-white hidden md:block min-h-screen">
+    <div class="p-6 text-2xl font-bold flex items-center gap-2">
+        <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
+            <span class="text-white text-sm">P</span>
+        </div>
+        {{PROJECT_NAME}}
+    </div>
+    <nav class="mt-10 space-y-2 px-4">
+        <a href="/home" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/home' ? 'bg-indigo-600' : '' ?>">Dashboard</a>
+        <a href="/about" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/about' ? 'bg-slate-800' : '' ?>">About</a>
+        <a href="/contact" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/contact' ? 'bg-slate-800' : '' ?>">Contact</a>
+    </nav>
+</aside>

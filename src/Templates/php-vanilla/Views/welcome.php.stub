@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $title ?> - {{PROJECT_NAME}}</title>
+    {{USE_TAILWIND}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    {{/USE_TAILWIND}}
+    {{USE_BOOTSTRAP}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{/USE_BOOTSTRAP}}
+</head>
+<body class="{{USE_TAILWIND}}bg-slate-50 text-slate-900 antialiased{{/USE_TAILWIND}}">
+    
+    <?php require_once __DIR__ . '/nav.php'; ?>
+
+    <main class="{{USE_TAILWIND}}relative overflow-hidden pt-16 pb-32 flex items-center min-h-[calc(100vh-64px)]{{/USE_TAILWIND}}">
+        <div class="{{USE_TAILWIND}}container mx-auto px-6 relative z-10{{/USE_TAILWIND}}">
+            <div class="{{USE_TAILWIND}}max-w-3xl{{/USE_TAILWIND}}">
+                <h1 class="{{USE_TAILWIND}}text-6xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent{{/USE_TAILWIND}}">
+                    Siguiente generación de Scaffolding Factory.
+                </h1>
+                <p class="{{USE_TAILWIND}}text-xl text-slate-600 mb-10 leading-relaxed{{/USE_TAILWIND}}">
+                    Construí aplicaciones PHP modernas con una arquitectura limpia y una interfaz premium. Tu proyecto PHP Vanilla ahora tiene superpoderes.
+                </p>
+
+                <div class="{{USE_TAILWIND}}flex items-center gap-4{{/USE_TAILWIND}}">
+                    <a href="/home" class="{{USE_TAILWIND}}px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-200{{/USE_TAILWIND}}">
+                        Comenzar Ahora
+                    </a>
+                    {{USE_LOGIN}}
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                    <a href="/login" class="{{USE_TAILWIND}}px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all{{/USE_TAILWIND}}">
+                        Iniciar Sesión
+                    </a>
+                    <?php endif; ?>
+                    {{/USE_LOGIN}}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decorative Background -->
+        <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
+        <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-violet-50 rounded-full blur-3xl opacity-50 -z-10"></div>
+    </main>
+
+    {{USE_BOOTSTRAP}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{/USE_BOOTSTRAP}}
+</body>
+</html>

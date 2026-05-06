@@ -1,12 +1,8 @@
 RewriteEngine On
 
-# Redirect / to index.php?view=welcome
-RewriteRule ^$ index.php?view=welcome [QSA,L]
-
-# Redirect /home, /about, etc to index.php?view=...
+# Ensure the request isn't for an actual file or directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?view=$1 [QSA,L]
 
-# Redirect /form/login, etc to index.php?form=...
-RewriteRule ^form/([a-zA-Z0-9_-]+)$ index.php?form=$1 [QSA,L]
+# Send all other requests to index.php
+RewriteRule ^.*$ index.php [L,QSA]

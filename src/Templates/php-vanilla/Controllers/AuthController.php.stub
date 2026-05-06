@@ -1,0 +1,78 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Models\User;
+
+class AuthController extends Controller
+{
+    private User $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new User();
+    }
+
+    public function showLogin(): void
+    {
+        $this->render('form/login');
+    }
+
+    public function login(): void
+    {
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $user = $this->userModel->findByEmail($email);
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            $this->redirect('/home');
+        }
+
+        $_SESSION['error'] = "Invalid credentials";
+        $this->redirect('/login');
+    }
+
+    public function showRegister(): void
+    {
+        $this->render('form/register');
+    }
+
+    public function register(): void
+    {
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        if (empty($name) || empty($email) || empty($password)) {
+            $_SESSION['error'] = "All fields are required";
+            $this->redirect('/register');
+        }
+
+        if ($this->userModel->findByEmail($email)) {
+            $_SESSION['error'] = "Email already registered";
+            $this->redirect('/register');
+        }
+
+        $userId = $this->userModel->create($name, $email, $password);
+        if ($userId) {
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['user_name'] = $name;
+            $this->redirect('/home');
+        }
+
+        $_SESSION['error'] = "Registration failed";
+        $this->redirect('/register');
+    }
+
+    public function logout(): void
+    {
+        session_destroy();
+        $this->redirect('/');
+    }
+}
