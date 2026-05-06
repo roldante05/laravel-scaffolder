@@ -36,13 +36,15 @@ class PhpVanillaBuilder implements BuilderInterface
     {
         @mkdir($path, 0755, true);
         @mkdir($path . '/src', 0755, true);
-        @mkdir($path . '/src/controllers', 0755, true);
-        @mkdir($path . '/src/models', 0755, true);
-        @mkdir($path . '/src/views', 0755, true);
+        @mkdir($path . '/src/Core', 0755, true);
+        @mkdir($path . '/src/Controllers', 0755, true);
+        @mkdir($path . '/src/Models', 0755, true);
+        @mkdir($path . '/src/Views', 0755, true);
+        @mkdir($path . '/src/Views/layout', 0755, true);
         @mkdir($path . '/src/resources', 0755, true);
 
         if ($options->login) {
-            @mkdir($path . '/src/views/form', 0755, true);
+            @mkdir($path . '/src/Views/form', 0755, true);
         }
     }
 
@@ -66,12 +68,18 @@ class PhpVanillaBuilder implements BuilderInterface
         // Files to process
         $files = [
             'index.php.stub' => 'index.php',
-            'app.php.stub' => 'src/controllers/app.php',
-            'welcome.php.stub' => 'src/views/welcome.php',
-            'home.php.stub' => 'src/views/home.php',
-            'nav.php.stub' => 'src/views/nav.php',
-            'contact.php.stub' => 'src/views/contact.php',
-            'about.php.stub' => 'src/views/about.php',
+            'Core/Router.php.stub' => 'src/Core/Router.php',
+            'Core/Controller.php.stub' => 'src/Core/Controller.php',
+            'Core/Model.php.stub' => 'src/Core/Model.php',
+            'Core/Database.php.stub' => 'src/Core/Database.php',
+            'Controllers/HomeController.php.stub' => 'src/Controllers/HomeController.php',
+            'Views/welcome.php.stub' => 'src/Views/welcome.php',
+            'Views/home.php.stub' => 'src/Views/home.php',
+            'Views/nav.php.stub' => 'src/Views/nav.php',
+            'Views/contact.php.stub' => 'src/Views/contact.php',
+            'Views/about.php.stub' => 'src/Views/about.php',
+            'Views/layout/sidebar.php.stub' => 'src/Views/layout/sidebar.php',
+            'Views/layout/header.php.stub' => 'src/Views/layout/header.php',
             'htaccess.stub' => '.htaccess',
             'docker-compose.yml.stub' => 'docker-compose.yml',
             'Dockerfile.stub' => 'Dockerfile',
@@ -84,11 +92,10 @@ class PhpVanillaBuilder implements BuilderInterface
         }
 
         if ($options->login) {
-            $files['form/login.php.stub'] = 'src/views/form/login.php';
-            $files['form/register.php.stub'] = 'src/views/form/register.php';
-            $files['form/authenticate.php.stub'] = 'src/views/form/authenticate.php';
-            $files['form/store.php.stub'] = 'src/views/form/store.php';
-            $files['form/logout.php.stub'] = 'src/views/form/logout.php';
+            $files['Controllers/AuthController.php.stub'] = 'src/Controllers/AuthController.php';
+            $files['Models/User.php.stub'] = 'src/Models/User.php';
+            $files['Views/form/login.php.stub'] = 'src/Views/form/login.php';
+            $files['Views/form/register.php.stub'] = 'src/Views/form/register.php';
         }
 
         foreach ($files as $stub => $dest) {
