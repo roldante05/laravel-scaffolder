@@ -1,3 +1,4 @@
+{{USE_TAILWIND}}
 <header class="bg-white shadow-sm p-4 flex justify-between items-center border-b border-slate-100">
     <h2 class="text-xl font-semibold text-slate-800">
         <?= match($_SERVER['REQUEST_URI']) {
@@ -21,3 +22,29 @@
         </a>
     </div>
 </header>
+{{/USE_TAILWIND}}
+{{USE_BOOTSTRAP}}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2 fw-bold text-dark">
+        <?= match($_SERVER['REQUEST_URI']) {
+            '/home' => 'Resumen Semanal',
+            '/about' => 'Sobre Nosotros',
+            '/contact' => 'Contacto',
+            default => 'Dashboard'
+        } ?>
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Exportar</button>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                Hola, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Usuario') ?>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{/USE_BOOTSTRAP}}
