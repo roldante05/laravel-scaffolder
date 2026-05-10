@@ -10,7 +10,8 @@
         "laravel/prompts": "^0.3.17"
     },
     "require-dev": {
-        "pestphp/pest": "^3.0"
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.1"
     },
     "authors": [
         {
