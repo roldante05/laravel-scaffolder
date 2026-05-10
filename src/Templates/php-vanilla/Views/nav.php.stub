@@ -1,23 +1,52 @@
 <?php if (!isset($_SESSION['user_id'])): ?>
-<nav class="{{USE_TAILWIND}}bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 p-4{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}navbar navbar-expand-lg navbar-light bg-light{{/USE_BOOTSTRAP}}">
-    <div class="{{USE_TAILWIND}}container mx-auto flex justify-between items-center px-6{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}container{{/USE_BOOTSTRAP}}">
-        <a href="/" class="{{USE_TAILWIND}}text-slate-900 text-2xl font-bold tracking-tight flex items-center gap-2{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}navbar-brand{{/USE_BOOTSTRAP}}">
+{{USE_TAILWIND}}
+<nav class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 p-4">
+    <div class="container mx-auto flex justify-between items-center px-6">
+        <a href="/" class="text-slate-900 text-2xl font-bold tracking-tight flex items-center gap-2">
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <span class="text-white text-sm">P</span>
             </div>
             {{PROJECT_NAME}}
         </a>
-        <div class="{{USE_TAILWIND}}hidden md:flex items-center gap-8{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}navbar-nav{{/USE_BOOTSTRAP}}">
-            <a href="/about" class="{{USE_TAILWIND}}text-slate-600 hover:text-indigo-600 font-medium transition-colors{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}nav-link{{/USE_BOOTSTRAP}}">Sobre nosotros</a>
-            <a href="/contact" class="{{USE_TAILWIND}}text-slate-600 hover:text-indigo-600 font-medium transition-colors{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}nav-link{{/USE_BOOTSTRAP}}">Contacto</a>
-            
+        <div class="hidden md:flex items-center gap-8">
+            <a href="/about" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Sobre nosotros</a>
+            <a href="/contact" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">Contacto</a>
             {{USE_LOGIN}}
             <div class="flex items-center gap-3 ml-4">
-                <a href="/login" class="{{USE_TAILWIND}}text-slate-700 hover:text-indigo-600 font-bold px-4 py-2{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}nav-link{{/USE_BOOTSTRAP}}">Entrar</a>
-                <a href="/register" class="{{USE_TAILWIND}}bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200{{/USE_TAILWIND}}{{USE_BOOTSTRAP}}btn btn-primary btn-sm{{/USE_BOOTSTRAP}}">Empezar</a>
+                <a href="/login" class="text-slate-700 hover:text-indigo-600 font-bold px-4 py-2">Entrar</a>
+                <a href="/register" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">Empezar</a>
             </div>
             {{/USE_LOGIN}}
         </div>
     </div>
 </nav>
+{{/USE_TAILWIND}}
+{{USE_BOOTSTRAP}}
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="/">{{PROJECT_NAME}}</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">Sobre nosotros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Contacto</a>
+                </li>
+                {{USE_LOGIN}}
+                <li class="nav-item ms-3">
+                    <a href="/login" class="btn btn-link text-decoration-none text-dark fw-medium">Login</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="/register" class="btn btn-primary rounded-pill px-4 shadow-sm">Registrarse</a>
+                </li>
+                {{/USE_LOGIN}}
+            </ul>
+        </div>
+    </div>
+</nav>
+{{/USE_BOOTSTRAP}}
 <?php endif; ?>
