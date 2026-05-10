@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Security\Helpers\SecurityHelper;
+
 abstract class Controller
 {
     protected function render(string $view, array $data = []): void
     {
-        extract($data);
+        // Escape all data for HTML output to prevent XSS
+        $escapedData = [];
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $escapedData[$key] = SecurityHelper::escapeHtml($value);
+            } elseif (is_array($value)) {
+                $escapedData[$key] = $this->escapeArrayRecursive($value);
+            } else {
+                $escapedData[$key] = $value;
+            }
+        }
+        
+        extract($escapedData);
         $viewFile = __DIR__ . "/../Views/$view.php";
         
         if (file_exists($viewFile)) {
@@ -18,8 +32,35 @@ abstract class Controller
         }
     }
 
+    /**
+     * Recursively escape array values for HTML output
+     *
+     * @param array $array The array to escape
+     * @return array The escaped array
+     */
+    private function escapeArrayRecursive(array $array): array
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_string($value)) {
+                $result[$key] = SecurityHelper::escapeHtml($value);
+            } elseif (is_array($value)) {
+                $result[$key] = $this->escapeArrayRecursive($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
     protected function redirect(string $url): void
     {
+        // Validate URL to prevent open redirect vulnerabilities
+        if (!SecurityHelper::validateUrl($url)) {
+            // Fallback to home if URL is invalid
+            $url = '/';
+        }
+        
         header("Location: $url");
         exit;
     }
