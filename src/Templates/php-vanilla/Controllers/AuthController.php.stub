@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\User;
+use App\Security\Helpers\SecurityHelper;
 
 class AuthController extends Controller
 {
@@ -14,64 +15,108 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->userModel = new User();
+        // Configurar sesión segura
+        SecurityHelper::configureSecureSession();
     }
 
     public function showLogin(): void
     {
+        // Generar token CSRF para el formulario
+        $_SESSION['csrf_token'] = SecurityHelper::generateCsrfToken();
         $this->render('form/login');
     }
 
     public function login(): void
     {
+        // Validar token CSRF
+        if (!isset($_POST['csrf_token']) || !SecurityHelper::validateCsrfToken($_POST['csrf_token'])) {
+            $_SESSION['error'] = "Invalid request";
+            $this->redirect('/login');
+            return;
+        }
+
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        $user = $this->userModel->findByEmail($email);
+        try {
+            // Validar y sanitizar entrada
+            $email = SecurityHelper::validateEmail($email);
+            $password = SecurityHelper::validateString($password, 8, 128); // Al menos 8 caracteres
 
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $this->redirect('/home');
+            $user = $this->userModel->findByEmail($email);
+
+            if ($user && SecurityHelper::verifyPassword($password, $user['password'])) {
+                // Regenerar ID de sesión tras login exitoso para prevenir fijación
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $this->redirect('/home');
+            }
+
+            $_SESSION['error'] = "Invalid credentials";
+            $this->redirect('/login');
+        } catch (\InvalidArgumentException $e) {
+            $_SESSION['error'] = "Invalid input: " . $e->getMessage();
+            $this->redirect('/login');
         }
-
-        $_SESSION['error'] = "Invalid credentials";
-        $this->redirect('/login');
     }
 
     public function showRegister(): void
     {
+        // Generar token CSRF para el formulario
+        $_SESSION['csrf_token'] = SecurityHelper::generateCsrfToken();
         $this->render('form/register');
     }
 
     public function register(): void
     {
+        // Validar token CSRF
+        if (!isset($_POST['csrf_token']) || !SecurityHelper::validateCsrfToken($_POST['csrf_token'])) {
+            $_SESSION['error'] = "Invalid request";
+            $this->redirect('/register');
+            return;
+        }
+
         $name = $_POST['name'] ?? '';
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
-        if (empty($name) || empty($email) || empty($password)) {
-            $_SESSION['error'] = "All fields are required";
+        try {
+            // Validar y sanitizar entrada
+            $name = SecurityHelper::validateString($name, 2, 50); // Nombre: 2-50 caracteres
+            $email = SecurityHelper::validateEmail($email);
+            $password = SecurityHelper::validateString($password, 8, 128); // Contraseña: 8-128 caracteres
+
+            if ($this->userModel->findByEmail($email)) {
+                $_SESSION['error'] = "Email already registered";
+                $this->redirect('/register');
+                return;
+            }
+
+            // Hashear la contraseña antes de almacenarla
+            $hashedPassword = SecurityHelper::hashPassword($password);
+            $userId = $this->userModel->create($name, $email, $hashedPassword);
+            
+            if ($userId) {
+                // Regenerar ID de sesión tras registro exitoso
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['user_name'] = $name;
+                $this->redirect('/home');
+            }
+
+            $_SESSION['error'] = "Registration failed";
+            $this->redirect('/register');
+        } catch (\InvalidArgumentException $e) {
+            $_SESSION['error'] = "Invalid input: " . $e->getMessage();
             $this->redirect('/register');
         }
-
-        if ($this->userModel->findByEmail($email)) {
-            $_SESSION['error'] = "Email already registered";
-            $this->redirect('/register');
-        }
-
-        $userId = $this->userModel->create($name, $email, $password);
-        if ($userId) {
-            $_SESSION['user_id'] = $userId;
-            $_SESSION['user_name'] = $name;
-            $this->redirect('/home');
-        }
-
-        $_SESSION['error'] = "Registration failed";
-        $this->redirect('/register');
     }
 
     public function logout(): void
     {
+        // Destruir sesión completamente
+        session_unset();
         session_destroy();
         $this->redirect('/');
     }
