@@ -46,6 +46,10 @@ The interactive wizard uses Laravel Prompts for a beautiful Terminal User Interf
 - **Login Kit**: Optional (only if DB is selected). Includes user table and auth logic.
 - **CSS Framework**: Tailwind CSS or Bootstrap 5.
 
+### Verbosity Control
+- **Quiet Mode (Default)**: Suppresses non-essential process output (Composer, Sail, etc.) while showing critical status indicators and errors.
+- **Verbose Mode (`-v`, `-vv`, or `--verbose`)**: Shows full logs from all internal processes for detailed debugging.
+
 ## Installation Script (`install.sh`)
 
 Every generated project includes an `install.sh` file. Your team members only need to run:
