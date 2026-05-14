@@ -15,7 +15,7 @@ Esta herramienta automatiza el tedioso proceso de configuración de las aplicaci
     - **Laravel**: Integración con Breeze, Jetstream o los Starter Kits oficiales.
     - **Vanilla PHP**: Kit de inicio de sesión opcional basado en sesiones con PDO, que incluye registro y gestión segura de sesiones.
 - **Estilo Moderno**: Soporte nativo para **Tailwind CSS v4** o **Bootstrap 5**.
-- **Despliegue Automatizado**: Genera un script inteligente `install.sh` que maneja la instalación de dependencias, la configuración del entorno y el inicio de los contenedores de un solo tirón.
+- **Automatización de Onboarding**: Genera un script `scripts/install.sh` que maneja la configuración del entorno para nuevos colaboradores (dependencias, variables de entorno y contenedores).
 
 ---
 
@@ -44,7 +44,7 @@ composer global require roldante05/scaffolding-factory
 ### 2. Crea un Nuevo Proyecto
 Ejecuta el comando `new` y proporciona un nombre para tu proyecto:
 ```bash
-scaffold new mi-proyecto-asombroso
+scaffold new mi-proyecto-web
 ```
 
 ### 3. Sigue el Asistente Interactivo
@@ -55,10 +55,14 @@ La CLI utiliza una interfaz TUI premium con **Laravel Prompts**. Usa las teclas 
 - **Diseño**: Elige tu framework de CSS favorito.
 
 ### 4. Inicializa y Ejecuta
-Una vez completado el scaffold, navega a la carpeta de tu proyecto y ejecuta el script de instalación:
+Una vez completado el scaffold, navega a la carpeta de tu proyecto y ejecuta el script de instalación.
+
+> [!IMPORTANT]
+> El script `scripts/install.sh` está diseñado para automatizar la configuración para **cualquier persona que clone el repositorio** (ej. desde GitHub). Instala las dependencias de Composer vía Docker, crea el archivo `.env` e inicia los contenedores.
+
 ```bash
-cd mi-proyecto-asombroso
-./install.sh
+cd mi-proyecto-web
+bash scripts/install.sh
 ```
 Este script construirá tu entorno Docker, instalará las dependencias y te proporcionará una URL local (usualmente `http://localhost`) donde tu aplicación estará funcionando.
 

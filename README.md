@@ -15,7 +15,7 @@ This tool automates the tedious setup process of modern web applications:
     - **Laravel**: Integration with Breeze, Jetstream, or Official Starter Kits.
     - **Vanilla PHP**: Optional Session-based Login Kit with PDO, including registration and secure session management.
 - **Modern Styling**: Out-of-the-box support for **Tailwind CSS v4** or **Bootstrap 5**.
-- **Automated Deployment**: Generates a smart `install.sh` script that handles dependency installation, environment configuration, and container startup in one go.
+- **Onboarding Automation**: Generates a `scripts/install.sh` script that handles environment setup for new collaborators (dependencies, environment variables, and containers).
 
 ---
 
@@ -44,7 +44,7 @@ composer global require roldante05/scaffolding-factory
 ### 2. Create a New Project
 Run the `new` command and provide a name for your project:
 ```bash
-scaffold new my-awesome-project
+scaffold new my-web-project
 ```
 
 ### 3. Follow the Interactive Wizard
@@ -55,10 +55,14 @@ The CLI uses a premium TUI (Terminal User Interface) with **Laravel Prompts**. U
 - **Design**: Pick your favorite CSS framework.
 
 ### 4. Initialize and Run
-Once the scaffolding is complete, navigate to your project folder and run the installation script:
+Once the scaffolding is complete, navigate to your project folder and run the installation script.
+
+> [!IMPORTANT]
+> The `scripts/install.sh` script is designed to automate the setup for **anyone who clones the repository** (e.g., from GitHub). It installs Composer dependencies via Docker, creates the `.env` file, and starts the containers.
+
 ```bash
-cd my-awesome-project
-./install.sh
+cd my-web-project
+bash scripts/install.sh
 ```
 This script will build your Docker environment, install dependencies, and provide you with a local URL (usually `http://localhost`) where your app is running.
 
