@@ -1,67 +1,89 @@
 # Scaffolding Factory 🚀
 
-A powerful CLI tool designed to scaffold modern web projects in seconds. Choose between **Laravel 13** or a custom **PHP Vanilla** setup, both fully dockerized and ready for development.
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D%208.2-8892bf.svg)](https://php.net)
+[![Composer Version](https://img.shields.io/badge/composer-%3E%3D%202.0-4479a1.svg)](https://getcomposer.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## Features
+**Scaffolding Factory** is a powerful Command Line Interface (CLI) tool designed to scaffold professional web projects in seconds. It bridges the gap between complex full-stack frameworks and lightweight custom setups by providing high-quality boilerplate for both **Laravel** and **Vanilla PHP**, fully containerized and ready for production-grade development.
 
-- 🏗️ **Dual Scaffolding**: Support for Laravel and PHP Vanilla.
-- 🐳 **Docker Integration**: Automated setup with Laravel Sail (for Laravel) or a custom Apache/PHP 8.3 container (for Vanilla).
-- 🔐 **Authentication Kits**:
-    - **Laravel**: Breeze, Jetstream, or official Starter Kits (Livewire, React, Vue).
-    - **Vanilla**: Optional Login Kit with PDO, including login, registration, and session management.
-- 🎨 **Modern Frontend**: Choice between **Tailwind CSS v4** or **Bootstrap 5**.
-- 🛠️ **Clean URLs**: Automatic `.htaccess` configuration for extension-less routing (e.g., `/home` instead of `home.php`).
-- ⚡ **Developer Friendly**: Generates a dynamic `install.sh` script so your team can set up the project with a single command.
+## 🛠️ What it does
 
-## Installation
+This tool automates the tedious setup process of modern web applications:
+- **Dual Architecture Support**: Choose between the robust Laravel ecosystem or a clean, optimized Vanilla PHP structure.
+- **Docker-First Workflow**: Automatically generates `docker-compose.yml` configurations (Laravel Sail or Custom Apache/PHP 8.3) so your environment is consistent everywhere.
+- **Instant Authentication**:
+    - **Laravel**: Integration with Breeze, Jetstream, or Official Starter Kits.
+    - **Vanilla PHP**: Optional Session-based Login Kit with PDO, including registration and secure session management.
+- **Modern Styling**: Out-of-the-box support for **Tailwind CSS v4** or **Bootstrap 5**.
+- **Onboarding Automation**: Generates a `scripts/install.sh` script that handles environment setup for new collaborators (dependencies, environment variables, and containers).
 
+---
+
+## 📋 Prerequisites
+
+Before using Scaffolding Factory, ensure your system meets the following requirements:
+
+- **PHP 8.2+**: Required to run the CLI tool and the generated projects.
+- **Composer**: Used for global installation and dependency management.
+- **Docker & Docker Compose**: Essential for the containerized development environment.
+- **Git**: For version control management during project creation.
+
+---
+
+## 🚀 Getting Started
+
+Follow these steps to create your first project:
+
+### 1. Installation
+Install the tool globally via Composer:
 ```bash
 composer global require roldante05/scaffolding-factory
 ```
+*Note: Make sure your global composer vendor bin directory is in your system's PATH.*
 
-*Or clone the repository and link the binary.*
-
-## Usage
-
-Create a new project by running:
-
+### 2. Create a New Project
+Run the `new` command and provide a name for your project:
 ```bash
-scaffold new my-awesome-project
+scaffold new my-web-project
 ```
 
-The interactive wizard will guide you through the configuration options.
+### 3. Follow the Interactive Wizard
+The CLI uses a premium TUI (Terminal User Interface) with **Laravel Prompts**. Use the arrow keys to select your preferences:
+- **Project Type**: Laravel or PHP Vanilla.
+- **Starter Kit**: Choose your authentication and stack preferences.
+- **Database**: Select from SQLite, MySQL, MariaDB, or PostgreSQL.
+- **Design**: Pick your favorite CSS framework.
 
-### 1. Laravel Flow
-- **Auth Kit**: Breeze, Jetstream, Starter Kits (Livewire, React, Vue), or None.
-- **Stacks**: Depends on the kit (Blade, Livewire, Inertia React/Vue, shadcn).
-- **Database**: SQLite, MySQL, MariaDB, PostgreSQL, SQL Server.
+### 4. Initialize and Run
+Once the scaffolding is complete, navigate to your project folder and run the installation script.
 
-### 2. PHP Vanilla Flow
-- **Database**: MySQL, SQLite, or None.
-- **Login Kit**: Optional (only if DB is selected). Includes user table and auth logic.
-- **CSS Framework**: Tailwind CSS or Bootstrap 5.
-
-## Installation Script (`install.sh`)
-
-Every generated project includes an `install.sh` file. Your team members only need to run:
+> [!IMPORTANT]
+> The `scripts/install.sh` script is designed to automate the setup for **anyone who clones the repository** (e.g., from GitHub). It installs Composer dependencies via Docker, creates the `.env` file, and starts the containers.
 
 ```bash
-./install.sh
+cd my-web-project
+bash scripts/install.sh
 ```
+This script will build your Docker environment, install dependencies, and provide you with a local URL (usually `http://localhost`) where your app is running.
 
-This script will:
-1. Verify Docker installation.
-2. Build and start the containers.
-3. Install dependencies via Composer/NPM.
-4. Set up the database and environment variables.
-5. Provide the local access URL.
+---
 
-## Requirements
+## 📖 Available Flows
 
-- PHP 8.3 or higher.
-- Composer.
-- Docker & Docker Compose.
+### Laravel Ecosystem
+- **Official Kits**: Breeze (Blade, Livewire, Inertia), Jetstream (Livewire, Inertia).
+- **Database**: Full support for standard SQL drivers.
+- **Sail Integration**: Pre-configured for easy container management.
 
-## License
+### Vanilla PHP
+- **MVC Ready**: Structured directories for a clean separation of concerns.
+- **Clean URLs**: Automated `.htaccess` configuration for extension-less routing (e.g., `/dashboard` instead of `dashboard.php`).
+- **PDO Wrapper**: Secure database interaction prepared for MySQL or SQLite.
 
-MIT License. Created by [Dante Roldan](https://github.com/roldante05).
+---
+
+## 📄 License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
+Developed with ❤️ by [Dante Roldan](https://github.com/roldante05)

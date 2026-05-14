@@ -1,0 +1,47 @@
+<?php
+$title = 'Welcome';
+$content = '
+{{USE_TAILWIND}}
+<div class="max-w-3xl">
+    <h1 class="text-6xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+        Siguiente generación de Scaffolding Factory.
+    </h1>
+    <p class="text-xl text-slate-600 mb-10 leading-relaxed">
+        Construí aplicaciones PHP modernas con una arquitectura limpia y una interfaz premium. Tu proyecto PHP Vanilla ahora tiene superpoderes.
+    </p>
+
+    <div class="flex items-center gap-4">
+        <a href="/home" class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-200">
+            Comenzar Ahora
+        </a>
+        {{USE_LOGIN}}
+        <?php if (!isset($_SESSION["user_id"])): ?>
+        <a href="/login" class="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">
+            Iniciar Sesión
+        </a>
+        <?php endif; ?>
+        {{/USE_LOGIN}}
+    </div>
+</div>
+{{/USE_TAILWIND}}
+{{USE_BOOTSTRAP}}
+<header class="py-5 mt-5">
+    <div class="container text-center">
+        <h1 class="display-3 fw-extrabold text-dark mb-4">La evolución de tu <span class="text-primary">Workflow</span></h1>
+        <p class="lead text-secondary mx-auto mb-5" style="max-width: 700px;">
+            Optimiza tus proyectos con nuestra herramienta integral. Diseñada para desarrolladores que buscan velocidad y estabilidad.
+        </p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a href="/home" class="btn btn-primary btn-lg px-5 py-3 rounded-4 fw-bold shadow">Empezar ahora</a>
+            {{USE_LOGIN}}
+            <?php if (!isset($_SESSION["user_id"])): ?>
+            <a href="/about" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-4 fw-bold">Ver funciones</a>
+            <?php endif; ?>
+            {{/USE_LOGIN}}
+        </div>
+    </div>
+</header>
+{{/USE_BOOTSTRAP}}
+';
+require_once __DIR__ . '/layout/app.php';
+?>

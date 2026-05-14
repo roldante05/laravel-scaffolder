@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+
+class HomeController extends Controller
+{
+    public function index(): void
+    {
+        $this->render('welcome', ['title' => 'Welcome to {{PROJECT_NAME}}']);
+    }
+
+    public function about(): void
+    {
+        $this->render('about', ['title' => 'About Us']);
+    }
+
+    public function contact(): void
+    {
+        $this->render('contact', ['title' => 'Contact Us']);
+    }
+
+    public function home(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            $this->redirect('/login');
+        }
+        $this->render('home', ['user' => $_SESSION['user_name']]);
+    }
+}

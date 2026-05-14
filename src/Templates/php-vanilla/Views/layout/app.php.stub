@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $title ?? 'App' ?> - {{PROJECT_NAME}}</title>
+    {{USE_TAILWIND}}
+    <script src="/src/resources/js/tailwindcss.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    {{/USE_TAILWIND}}
+    {{USE_BOOTSTRAP}}
+    <link href="/src/resources/css/bootstrap.min.css" rel="stylesheet">
+    {{/USE_BOOTSTRAP}}
+</head>
+<body class="{{USE_TAILWIND}}bg-slate-100 text-slate-900 antialiased{{/USE_TAILWIND}}">
+
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <!-- Dashboard layout (logged in) -->
+        {{USE_TAILWIND}}
+        <div class="min-h-screen flex">
+            <?php require_once __DIR__ . '/sidebar.php'; ?>
+            <div class="flex-1 flex flex-col">
+                <?php require_once __DIR__ . '/header.php'; ?>
+                <main class="p-8">
+                    <?= $content ?? '' ?>
+                </main>
+            </div>
+        </div>
+        {{/USE_TAILWIND}}
+        {{USE_BOOTSTRAP}}
+        <div class="container-fluid">
+            <div class="row">
+                <?php require_once __DIR__ . '/sidebar.php'; ?>
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light min-vh-100">
+                    <?php require_once __DIR__ . '/header.php'; ?>
+                    <?= $content ?? '' ?>
+                </main>
+            </div>
+        </div>
+        {{/USE_BOOTSTRAP}}
+    <?php else: ?>
+        <!-- Public layout (not logged in) -->
+        {{USE_TAILWIND}}
+        <?php require_once __DIR__ . '/../nav.php'; ?>
+        <main class="relative overflow-hidden pt-16 pb-32 flex items-center min-h-[calc(100vh-64px)]">
+            <div class="container mx-auto px-6 relative z-10">
+                <?= $content ?? '' ?>
+            </div>
+            <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
+            <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-violet-50 rounded-full blur-3xl opacity-50 -z-10"></div>
+        </main>
+        {{/USE_TAILWIND}}
+        {{USE_BOOTSTRAP}}
+        <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary fs-3" href="/">{{PROJECT_NAME}}</a>
+                <div class="ms-auto d-flex gap-2">
+                    <a href="/about" class="btn btn-link text-decoration-none text-dark fw-medium">About</a>
+                    <a href="/contact" class="btn btn-link text-decoration-none text-dark fw-medium">Contact</a>
+                    <a href="/login" class="btn btn-link text-decoration-none text-dark fw-medium">Login</a>
+                    <a href="/register" class="btn btn-primary rounded-pill px-4 shadow-sm">Registrarse</a>
+                </div>
+            </div>
+        </nav>
+        <main class="py-5 mt-5">
+            <div class="container">
+                <?= $content ?? '' ?>
+            </div>
+        </main>
+        {{/USE_BOOTSTRAP}}
+    <?php endif; ?>
+
+    {{USE_BOOTSTRAP}}
+    <script src="/src/resources/js/bootstrap.bundle.min.js"></script>
+    {{/USE_BOOTSTRAP}}
+</body>
+</html>

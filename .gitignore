@@ -3,4 +3,4 @@ composer.lock
 .DS_Thumbs.db
 .env
 .phpunit.result.cache
-RELEASES/
+openspec/

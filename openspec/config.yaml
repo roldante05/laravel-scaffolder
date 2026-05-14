@@ -1,0 +1,33 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: PHP 8.3, Symfony Console/Process, Laravel Prompts
+  Architecture: Builder Pattern, Stub-based templating
+  Testing: Pest ^3.0 (Strict TDD Mode: enabled)
+  Style: PSR-12, modern PHP 8.x
+
+strict_tdd: true
+
+testing:
+  framework: Pest
+  command: composer test
+  layers:
+    unit: true
+    integration: false
+    e2e: false
+  coverage: false
+
+rules:
+  proposal:
+    - Identify affected builders and templates
+    - Document breaking changes in stub variables
+  specs:
+    - Use Given/When/Then format
+    - Define expected file structure after scaffolding
+  design:
+    - Document DTOs for builder options
+    - Map stub variable changes
+  tasks:
+    - Separate infrastructure (stubs) from implementation (PHP)
+    - Ensure test coverage for new builder logic

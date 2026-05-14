@@ -1,0 +1,314 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Roldante05\ScaffoldingFactory\Security\Helpers;
+
+/**
+ * Clase de ayuda para funcionalidades de seguridad en proyectos PHP Vanilla
+ * Proporciona validación de entrada, protección CSRF, hashing seguro y más
+ */
+class SecurityHelper
+{
+    /**
+     * Genera un token CSRF seguro y lo almacena en la sesión
+     *
+     * @return string El token CSRF generado
+     */
+    public static function generateCsrfToken(): string
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['csrf_token'] = $token;
+
+        return $token;
+    }
+
+    /**
+     * Valida un token CSRF proporcionado
+     *
+     * @param string $token El token a validar
+     * @return bool Verdadero si el token es válido, falso en caso contrario
+     */
+    public static function validateCsrfToken(string $token): bool
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    }
+
+    /**
+     * Valida y sanitiza una entrada de correo electrónico
+     *
+     * @param mixed $input La entrada a validar
+     * @return string El correo electrónico validado
+     * @throws \InvalidArgumentException Si el correo electrónico es inválido
+     */
+    public static function validateEmail(mixed $input): string
+    {
+        $email = filter_var($input, FILTER_VALIDATE_EMAIL);
+
+        if ($email === false) {
+            throw new \InvalidArgumentException('Invalid email format');
+        }
+
+        return $email;
+    }
+
+    /**
+     * Valida y sanitiza una entrada de URL
+     *
+     * @param mixed $input La entrada a validar
+     * @return string La URL validada
+     * @throws \InvalidArgumentException Si la URL es inválida
+     */
+    public static function validateUrl(mixed $input): string
+    {
+        // Permitir rutas relativas (que comienzan con /) para uso interno
+        if (is_string($input) && preg_match('#^/.*#', $input)) {
+            return $input;
+        }
+        
+        $url = filter_var($input, FILTER_VALIDATE_URL);
+
+        if ($url === false) {
+            throw new \InvalidArgumentException('Invalid URL format');
+        }
+
+        $parsed = parse_url($url);
+
+        // Solo permitir http/https
+        if (!isset($parsed['scheme']) || !in_array($parsed['scheme'], ['http', 'https'], true)) {
+            throw new \InvalidArgumentException('URL must use http or https');
+        }
+
+        return $url;
+    }
+
+    /**
+     * Valida que una entrada sea un número entero positivo
+     *
+     * @param mixed $input La entrada a validar
+     * @param int $min Valor mínimo permitido (predeterminado: 1)
+     * @return int El entero validado
+     * @throws \InvalidArgumentException Si la entrada no es un entero positivo válido
+     */
+    public static function validatePositiveInt(mixed $input, int $min = 1): int
+    {
+        if (!is_numeric($input)) {
+            throw new \InvalidArgumentException('Input must be numeric');
+        }
+
+        $value = (int)$input;
+
+        if ($value < $min) {
+            throw new \InvalidArgumentException(sprintf('Value must be at least %d', $min));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Valida que una entrada contenga solo caracteres permitidos (para nombres de usuario, etc.)
+     *
+     * @param string $input La entrada a validar
+     * @param int $minLength Longitud mínima permitida
+     * @param int $maxLength Longitud máxima permitida
+     * @param string $pattern Patrón regex permitido (predeterminado: alfanumérico, guion, guion bajo)
+     * @return string La entrada validada
+     * @throws \InvalidArgumentException Si la entrada contiene caracteres no permitidos
+     */
+    public static function validateString(string $input, int $minLength = 1, int $maxLength = 50, string $pattern = '/^[a-zA-Z0-9_-]+$/')
+    {
+        if (strlen($input) < $minLength) {
+            throw new \InvalidArgumentException(sprintf('Value must be at least %d characters long', $minLength));
+        }
+
+        if (strlen($input) > $maxLength) {
+            throw new \InvalidArgumentException(sprintf('Value must not exceed %d characters', $maxLength));
+        }
+
+        if (!preg_match($pattern, $input)) {
+            throw new \InvalidArgumentException('Value contains invalid characters');
+        }
+
+        return $input;
+    }
+
+    /**
+     * Genera un hash seguro de contraseña usando Argon2id
+     *
+     * @param string $password La contraseña a hashear
+     * @return string El hash de la contraseña
+     */
+    public static function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_ARGON2ID, [
+            'memory_cost' => 65536,
+            'time_cost' => 4,
+            'threads' => 3,
+        ]);
+    }
+
+    /**
+     * Verifica una contraseña contra su hash
+     *
+     * @param string $password La contraseña a verificar
+     * @param string $hash El hash contra el cual verificar
+     * @return bool Verdadero si la contraseña coincide con el hash, falso en caso contrario
+     */
+    public static function verifyPassword(string $password, string $hash): bool
+    {
+        return password_verify($password, $hash);
+    }
+
+    /**
+     * Determina si un hash de contraseña necesita ser rehasheado (por ejemplo, si los parámetros cambiaron)
+     *
+     * @param string $hash El hash a verificar
+     * @return bool Verdadero si el hash necesita ser rehasheado, falso en caso contrario
+     */
+    public static function passwordNeedsRehash(string $hash): bool
+    {
+        return password_needs_rehash($hash, PASSWORD_ARGON2ID, [
+            'memory_cost' => 65536,
+            'time_cost' => 4,
+            'threads' => 3,
+        ]);
+    }
+
+    /**
+     * Escapa una cadena para su uso seguro en contexto HTML (previene XSS)
+     *
+     * @param string $input La cadena a escapar
+     * @return string La cadena escapada
+     */
+    public static function escapeHtml(string $input): string
+    {
+        return htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * Escapa una cadena para su uso seguro en atributos HTML
+     *
+     * @param string $input La cadena a escapar
+     * @return string La cadena escapada
+     */
+    public static function escapeHtmlAttr(string $input): string
+    {
+        return htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * Escapa una cadena para su uso seguro en URLs
+     *
+     * @param string $input La cadena a escapar
+     * @return string La cadena escapada
+     */
+    public static function escapeUrl(string $input): string
+    {
+        return urlencode($input);
+    }
+
+    /**
+     * Escapa una cadena para su uso seguro en JavaScript
+     *
+     * @param string $input La cadena a escapar
+     * @return string La cadena escapada
+     */
+    public static function escapeJs(string $input): string
+    {
+        return json_encode($input, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
+    /**
+     * Aplica headers de seguridad HTTP
+     */
+    public static function applySecurityHeaders(): void
+    {
+        // Prevenir clickjacking
+        header('X-Frame-Options: SAMEORIGIN');
+
+        // Prevenir MIME sniffing
+        header('X-Content-Type-Options: nosniff');
+
+        // Protección XSS (legacy pero aún útil)
+        header('X-XSS-Protection: 1; mode=block');
+
+        // Política de referrer
+        header('Referrer-Policy: strict-origin-when-cross-origin');
+
+        // HSTS - solo si estamos en HTTPS (en producción)
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
+
+        // Content Security Policy básica
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'");
+    }
+
+    /**
+     * Configura opciones de sesión seguras
+     */
+    public static function configureSecureSession(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            // Cookie de sesión solo HTTP (no accesible via JavaScript)
+            ini_set('session.cookie_httponly', '1');
+            
+            // Cookie de sesión solo sobre HTTPS (en producción)
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+                ini_set('session.cookie_secure', '1');
+            }
+            
+            // Prevenir ataque de fijación de sesión
+            ini_set('session.use_strict_mode', '1');
+            
+            // SameSite attribute para prevenir CSRF
+            ini_set('session.cookie_samesite', 'Strict');
+            
+            // Only apply these settings when we're actually starting the session
+            session_start();
+            
+            // Regenerar ID de sesión periódicamente para prevenir fijación
+            if (!isset($_SESSION['LAST_REGEN']) || (time() - $_SESSION['LAST_REGEN']) > 300) {
+                session_regenerate_id(true);
+                $_SESSION['LAST_REGEN'] = time();
+            }
+        }
+        // If session is already active, we cannot securely configure it here
+        // Application should ensure session configuration happens before any session starts
+    }
+
+    /**
+     * Previene path traversal asegurando que una ruta esté dentro de un directorio base
+     *
+     * @param string $userPath La ruta proporcionada por el usuario
+     * @param string $baseDir El directorio base seguro
+     * @return string La ruta segura y resuelta
+     * @throws \InvalidArgumentException Si la ruta intenta salir del directorio base
+     */
+    public static function preventPathTraversal(string $userPath, string $baseDir): string
+    {
+        // Resolver la ruta base
+        $baseDir = realpath($baseDir);
+        if ($baseDir === false) {
+            throw new \InvalidArgumentException('Base directory does not exist');
+        }
+
+        // Resolver la ruta solicitada
+        $requestedPath = realpath($baseDir . DIRECTORY_SEPARATOR . $userPath);
+        
+        // Si la ruta no existe o no está dentro del directorio base, lanzamos una excepción
+        if ($requestedPath === false || strpos($requestedPath, $baseDir) !== 0) {
+            throw new \InvalidArgumentException('Invalid path');
+        }
+
+        return $requestedPath;
+    }
+}
