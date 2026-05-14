@@ -1,89 +1,85 @@
 # Scaffolding Factory 🚀
 
-Una poderosa herramienta de línea de comandos diseñada para scaffoldear proyectos web modernos en segundos. Elige entre **Laravel 13** o un setup personalizado de **PHP Vanilla**, ambos totalmente dockerizados y listos para desarrollo.
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D%208.2-8892bf.svg)](https://php.net)
+[![Composer Version](https://img.shields.io/badge/composer-%3E%3D%202.0-4479a1.svg)](https://getcomposer.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## Características
+**Scaffolding Factory** es una potente herramienta de interfaz de línea de comandos (CLI) diseñada para crear proyectos web profesionales en segundos. Cierra la brecha entre frameworks complejos y configuraciones personalizadas ligeras, proporcionando una estructura base de alta calidad tanto para **Laravel** como para **PHP Vanilla**, totalmente dockerizada y lista para el desarrollo de nivel profesional.
 
-- 🏗️ **Scaffoldado Dual**: Soporte para Laravel y PHP Vanilla.
-- 🐳 **Integración con Docker**: Configuración automática con Laravel Sail (para Laravel) o un contenedor personalizado de Apache/PHP 8.3 (para Vanilla).
-- 🔐 **Kits de Autenticación**:
-    - **Laravel**: Breeze, Jetstream, o Kits de Inicio Oficiales (Livewire, React, Vue).
-    - **Vanilla**: Kit de Inicio de Sesión opcional con PDO, incluyendo login, registro y gestión de sesiones.
-- 🎨 **Frontend Moderno**: Elección entre **Tailwind CSS v4** o **Bootstrap 5**.
-- 🛠️ **URLs Limpias**: Configuración automática de `.htaccess` para rutas sin extensión (ej: `/home` en lugar de `home.php`).
-- ⚡ **Amigable para Desarrolladores**: Genera un script dinámico `install.sh` para que tu equipo pueda configurar el proyecto con un solo comando.
+## 🛠️ ¿Qué es lo que hace?
 
-## Instalación
+Esta herramienta automatiza el tedioso proceso de configuración de las aplicaciones web modernas:
+- **Soporte de Arquitectura Dual**: Elige entre el robusto ecosistema de Laravel o una estructura de PHP Vanilla limpia y optimizada.
+- **Flujo de Trabajo Docker-First**: Genera automáticamente configuraciones de `docker-compose.yml` (Laravel Sail o Apache/PHP 8.3 personalizado) para que tu entorno sea consistente en cualquier lugar.
+- **Autenticación Instantánea**:
+    - **Laravel**: Integración con Breeze, Jetstream o los Starter Kits oficiales.
+    - **Vanilla PHP**: Kit de inicio de sesión opcional basado en sesiones con PDO, que incluye registro y gestión segura de sesiones.
+- **Estilo Moderno**: Soporte nativo para **Tailwind CSS v4** o **Bootstrap 5**.
+- **Despliegue Automatizado**: Genera un script inteligente `install.sh` que maneja la instalación de dependencias, la configuración del entorno y el inicio de los contenedores de un solo tirón.
 
+---
+
+## 📋 Requisitos Previos
+
+Antes de usar Scaffolding Factory, asegúrate de que tu sistema cumpla con los siguientes requisitos:
+
+- **PHP 8.2+**: Necesario para ejecutar la herramienta CLI y los proyectos generados.
+- **Composer**: Utilizado para la instalación global y la gestión de dependencias.
+- **Docker y Docker Compose**: Esenciales para el entorno de desarrollo dockerizado.
+- **Git**: Para la gestión del control de versiones durante la creación del proyecto.
+
+---
+
+## 🚀 Pasos para Empezar
+
+Sigue estos pasos para crear tu primer proyecto:
+
+### 1. Instalación
+Instala la herramienta globalmente a través de Composer:
 ```bash
 composer global require roldante05/scaffolding-factory
 ```
+*Nota: Asegúrate de que el directorio bin de composer global esté en el PATH de tu sistema.*
 
-*O clona el repositorio y enlaza el binario.*
-
-## Uso
-
-Crea un nuevo proyecto ejecutando:
-
+### 2. Crea un Nuevo Proyecto
+Ejecuta el comando `new` y proporciona un nombre para tu proyecto:
 ```bash
 scaffold new mi-proyecto-asombroso
 ```
 
-El asistente interactivo te guiará a través de las opciones de configuración con una navegación mejorada:
-- Usa las **flechas** (↑ ↓) para seleccionar opciones
-- Presiona **Enter** para confirmar tu selección
-- Presiona **Esc** para volver al paso anterior
+### 3. Sigue el Asistente Interactivo
+La CLI utiliza una interfaz TUI premium con **Laravel Prompts**. Usa las teclas de flecha para seleccionar tus preferencias:
+- **Tipo de Proyecto**: Laravel o PHP Vanilla.
+- **Kit de Inicio**: Elige tus preferencias de autenticación y stack.
+- **Base de Datos**: Selecciona entre SQLite, MySQL, MariaDB o PostgreSQL.
+- **Diseño**: Elige tu framework de CSS favorito.
 
-### 1. Flujo de Laravel
-- **Kit de Autenticación**: Breeze, Jetstream, Kits de Inicio Oficiales (Livewire, React, Vue), o Ninguno.
-- **Stacks**: Depende del kit (Blade, Livewire, Inertia React/Vue, shadcn).
-- **Base de Datos**: SQLite, MySQL, MariaDB, PostgreSQL, SQL Server.
-
-### 2. Flujo de PHP Vanilla
-- **Base de Datos**: MySQL, SQLite, o Ninguna.
-- **Kit de Inicio de Sesión**: Opcional (solo si se selecciona DB). Incluye tabla de usuarios y lógica de autenticación.
-- **Framework CSS**: Tailwind CSS o Bootstrap 5.
-
-## Script de Instalación (`install.sh`)
-
-Cada proyecto generado incluye un archivo `install.sh`. Los miembros de tu equipo solo necesitan ejecutar:
-
+### 4. Inicializa y Ejecuta
+Una vez completado el scaffold, navega a la carpeta de tu proyecto y ejecuta el script de instalación:
 ```bash
+cd mi-proyecto-asombroso
 ./install.sh
 ```
+Este script construirá tu entorno Docker, instalará las dependencias y te proporcionará una URL local (usualmente `http://localhost`) donde tu aplicación estará funcionando.
 
-Este script hará:
-1. Verificar la instalación de Docker.
-2. Construir y iniciar los contenedores.
-3. Instalar dependencias mediante Composer/NPM.
-4. Configurar la base de datos y variables de entorno.
-5. Proveer la URL de acceso local.
+---
 
-## Levantar proyectos en local
+## 📖 Flujos Disponibles
 
-### Para proyectos Laravel:
-1. Después de ejecutar `./install.sh`, el script proporcionará la URL de acceso (usualmente http://localhost)
-2. Los contenedores de Laravel Sail se iniciarán automáticamente
-3. Para parar los contenedores: `./vendor/bin/sail down`
-4. Para volver a iniciar los contenedores: `./vendor/bin/sail up -d`
-5. Para ejecutar comandos Artisan: `./vendor/bin/sail artisan [comando]`
-6. Para acceder a la base de datos: Usa las credenciales proporcionadas en el archivo .env
+### Ecosistema Laravel
+- **Kits Oficiales**: Breeze (Blade, Livewire, Inertia), Jetstream (Livewire, Inertia).
+- **Base de Datos**: Soporte completo para los drivers SQL estándar.
+- **Integración Sail**: Pre-configurado para una gestión sencilla de contenedores.
 
-### Para proyectos PHP Vanilla:
-1. Después de ejecutar `./install.sh`, el script proporcionará la URL de acceso (usualmente http://localhost)
-2. El contenedor personalizado de Apache/PHP 8.3 se iniciará automáticamente
-3. Para parar el contenedor: `docker compose down`
-4. Para volver a iniciar el contenedor: `docker compose up -d`
-5. Los archivos del proyecto se sirven directamente desde el contenedor
-6. Para ver logs: `docker compose logs -f`
-7. Para acceder a la base de datos (si se configuró): Usa las credenciales en el archivo .env
+### PHP Vanilla
+- **Listo para MVC**: Directorios estructurados para una separación clara de responsabilidades.
+- **URLs Limpias**: Configuración automatizada de `.htaccess` para rutas sin extensiones (ej. `/dashboard` en lugar de `dashboard.php`).
+- **Wrapper de PDO**: Interacción segura con la base de datos preparada para MySQL o SQLite.
 
-## Requisitos
+---
 
-- PHP 8.3 o superior.
-- Composer.
-- Docker & Docker Compose.
+## 📄 Licencia
 
-## Licencia
+Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más información.
 
-MIT Licencia. Creado por [Dante Roldan](https://github.com/roldante05).
+Desarrollado con ❤️ por [Dante Roldan](https://github.com/roldante05)
