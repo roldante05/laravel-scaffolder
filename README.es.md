@@ -75,6 +75,122 @@ Este script construirá tu entorno Docker, instalará las dependencias y te prop
 - **Base de Datos**: Soporte completo para los drivers SQL estándar.
 - **Integración Sail**: Pre-configurado para una gestión sencilla de contenedores.
 
+> [!NOTE]
+> **SQL Server** está en las opciones de base de datos pero tiene limitaciones con Sail. SQL Server requiere la extensión PHP `pdo_sqlsrv`, que no está incluida en los contenedores Docker por defecto de Sail. Si seleccionas SQL Server, Sail no se instalará y necesitarás configurar tu propia conexión a la base de datos. Para desarrollo local con SQL Server, considera usar [Laravel Herd Pro](https://herd.laravel.com) o una instancia local de SQL Server.
+
+### Usar un servidor de base de datos con Sail
+
+Cuando seleccionás un Starter Kit, el instalador usa SQLite por defecto. Si más adelante querés cambiar a MySQL, MariaDB o PostgreSQL, agregá el servicio correspondiente en tu `compose.yaml` y actualizá el `.env`.
+
+#### MySQL
+
+Agregá este servicio bajo `services:` en `compose.yaml`:
+
+```yaml
+mysql:
+    image: 'mysql/mysql-server:8.0'
+    ports:
+        - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+        MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+        MYSQL_ROOT_HOST: '%'
+        MYSQL_DATABASE: '${DB_DATABASE}'
+        MYSQL_USER: '${DB_USERNAME}'
+        MYSQL_PASSWORD: '${DB_PASSWORD}'
+        MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+        - 'sail-mysql:/var/lib/mysql'
+    networks:
+        - sail
+```
+
+Agregá el volumen bajo `volumes:`:
+
+```yaml
+volumes:
+    sail-mysql:
+        driver: local
+```
+
+Actualizá tu `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+#### MariaDB
+
+```yaml
+mariadb:
+    image: 'mariadb:10'
+    ports:
+        - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+        MARIADB_ROOT_PASSWORD: '${DB_PASSWORD}'
+        MARIADB_DATABASE: '${DB_DATABASE}'
+        MARIADB_USER: '${DB_USERNAME}'
+        MARIADB_PASSWORD: '${DB_PASSWORD}'
+    volumes:
+        - 'sail-mariadb:/var/lib/mysql'
+    networks:
+        - sail
+```
+
+```yaml
+volumes:
+    sail-mariadb:
+        driver: local
+```
+
+```env
+DB_CONNECTION=mariadb
+DB_HOST=mariadb
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+#### PostgreSQL
+
+```yaml
+pgsql:
+    image: 'postgres:16'
+    ports:
+        - '${FORWARD_DB_PORT:-5432}:5432'
+    environment:
+        POSTGRES_USER: '${DB_USERNAME}'
+        POSTGRES_PASSWORD: '${DB_PASSWORD}'
+        POSTGRES_DB: '${DB_DATABASE}'
+    volumes:
+        - 'sail-pgsql:/var/lib/postgresql/data'
+    networks:
+        - sail
+```
+
+```yaml
+volumes:
+    sail-pgsql:
+        driver: local
+```
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=pgsql
+DB_PORT=5432
+DB_DATABASE=laravel
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
+
+> [!NOTE]
+> Después de agregar el servicio, ejecutá `docker compose up -d` para iniciarlo y luego `sail artisan migrate` para crear las tablas.
+
 ### PHP Vanilla
 - **Listo para MVC**: Directorios estructurados para una separación clara de responsabilidades.
 - **URLs Limpias**: Configuración automatizada de `.htaccess` para rutas sin extensiones (ej. `/dashboard` en lugar de `dashboard.php`).
