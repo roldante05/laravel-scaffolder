@@ -64,7 +64,7 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($projectName . '/index.php');
         $this->assertFileExists($projectName . '/che');
         $this->assertFileExists($projectName . '/che.php');
-        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/src/routes/web.php');
         $this->assertFileExists($projectName . '/config/config.php');
         $this->assertFileExists($projectName . '/migrations/001_create_users_table.php');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
@@ -105,7 +105,7 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($projectName . '/index.php');
         $this->assertFileExists($projectName . '/che');
         $this->assertFileExists($projectName . '/che.php');
-        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/src/routes/web.php');
         $this->assertFileExists($projectName . '/config/config.php');
         $this->assertFileExists($projectName . '/migrations');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
@@ -152,7 +152,7 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertFileExists($projectName . '/index.php');
         $this->assertFileExists($projectName . '/che');
         $this->assertFileExists($projectName . '/che.php');
-        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/src/routes/web.php');
         $this->assertFileExists($projectName . '/config/config.php');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
         $this->assertFileExists($projectName . '/src/Core/ORM.php');
