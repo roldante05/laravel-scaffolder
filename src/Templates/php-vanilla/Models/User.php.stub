@@ -4,24 +4,26 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Core\Model;
+use App\Core\ORM;
 
-class User extends Model
+class User extends ORM
 {
-    public function findByEmail(string $email): ?array
+    public static function findByEmail(string $email): ?static
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
-        return $user ?: null;
+        return self::where('email', $email)->first();
     }
 
-    public function create(string $name, string $email, string $password): int|false
+    public static function createUser(string $name, string $email, string $password): int|false
     {
-        $stmt = $this->db->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-        if ($stmt->execute([$name, $email, $password])) {
-            return (int) $this->db->lastInsertId();
+        $user = new static();
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = $password;
+
+        if ($user->save()) {
+            return (int)$user->id;
         }
+
         return false;
     }
 }

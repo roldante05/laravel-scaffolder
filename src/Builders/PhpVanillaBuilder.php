@@ -121,8 +121,15 @@ class PhpVanillaBuilder implements BuilderInterface
         @mkdir($path . '/src/resources/css', 0755, true);
         @mkdir($path . '/src/resources/js', 0755, true);
 
+        @mkdir($path . '/src/routes', 0755, true);
+        @mkdir($path . '/config', 0755, true);
+
         if ($options->login) {
             @mkdir($path . '/src/Views/form', 0755, true);
+        }
+
+        if ($options->database !== 'none') {
+            @mkdir($path . '/migrations', 0755, true);
         }
 
         $this->downloadResources($path, $options);
@@ -196,15 +203,22 @@ class PhpVanillaBuilder implements BuilderInterface
         $variables = [
             'PROJECT_NAME' => basename($path),
             'DB_DATABASE' => basename($path),
+            'DB_CONNECTION' => $options->database,
         ];
 
         // Files to process
         $files = [
             'index.php.stub' => 'index.php',
+            'che.stub' => 'che',
+            'che.php.stub' => 'che.php',
+            'config/config.php.stub' => 'config/config.php',
+            'routes/web.php.stub' => 'src/routes/web.php',
             'Core/Router.php.stub' => 'src/Core/Router.php',
             'Core/Controller.php.stub' => 'src/Core/Controller.php',
             'Core/Model.php.stub' => 'src/Core/Model.php',
             'Core/Database.php.stub' => 'src/Core/Database.php',
+            'Core/ORM.php.stub' => 'src/Core/ORM.php',
+            'Core/Migration.php.stub' => 'src/Core/Migration.php',
             'Controllers/HomeController.php.stub' => 'src/Controllers/HomeController.php',
             'Views/welcome.php.stub' => 'src/Views/welcome.php',
             'Views/home.php.stub' => 'src/Views/home.php',
@@ -227,11 +241,18 @@ class PhpVanillaBuilder implements BuilderInterface
         }
 
         if ($options->login) {
+            $files['Core/Auth.php.stub'] = 'src/Core/Auth.php';
             $files['Controllers/AuthController.php.stub'] = 'src/Controllers/AuthController.php';
             $files['Models/User.php.stub'] = 'src/Models/User.php';
             $files['Views/form/login.php.stub'] = 'src/Views/form/login.php';
             $files['Views/form/register.php.stub'] = 'src/Views/form/register.php';
         }
+
+        if ($options->login && $options->database !== 'none') {
+            $files['migrations/001_create_users_table.php.stub'] = 'migrations/001_create_users_table.php';
+        }
+
+        $executables = ['scripts/install.sh', 'che'];
 
         foreach ($files as $stub => $dest) {
             $stubFile = $templatesDir . '/' . $stub;
@@ -246,7 +267,7 @@ class PhpVanillaBuilder implements BuilderInterface
                 }
                 file_put_contents($destPath, $processed);
 
-                if (str_ends_with($dest, '.sh')) {
+                if (in_array($dest, $executables, true)) {
                     chmod($destPath, 0755);
                 }
             }

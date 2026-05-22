@@ -1,0 +1,92 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * ChePHP - CLI Tool
+ *
+ * Comandos disponibles:
+ *   php che migrate     -> Ejecuta migraciones pendientes
+ *   php che rollback    -> Revierte ultimo batch
+ *   php che serve       -> Inicia servidor de desarrollo
+ *   php che route:list  -> Lista rutas registradas
+ */
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$command = $argv[1] ?? 'help';
+
+switch ($command) {
+    case 'migrate':
+        echo "📦 Ejecutando migraciones...\n";
+        $migration = new \App\Core\Migration(__DIR__ . '/migrations');
+        $results = $migration->migrate();
+        foreach ($results as $r) {
+            $icon = $r['status'] === 'executed' ? '✅' : '❌';
+            echo "  $icon {$r['name']}";
+            if (isset($r['error'])) echo " — {$r['error']}";
+            echo "\n";
+        }
+        echo "✔️  Hecho.\n";
+        break;
+
+    case 'rollback':
+        echo "↩️  Revirtiendo migraciones...\n";
+        $migration = new \App\Core\Migration(__DIR__ . '/migrations');
+        $results = $migration->rollback();
+        foreach ($results as $r) {
+            $icon = $r['status'] === 'rolled back' ? '↩️' : ($r['status'] === 'nothing to rollback' ? 'ℹ️' : '❌');
+            echo "  $icon {$r['name']}\n";
+        }
+        echo "✔️  Hecho.\n";
+        break;
+
+    case 'serve':
+        $port = $argv[2] ?? '8080';
+        $host = $argv[3] ?? 'localhost';
+        echo "⚡ ChePHP — Servidor de desarrollo\n";
+        echo "🌐 http://$host:$port\n";
+        echo "────────────────────────────────\n";
+        passthru("php -S $host:$port -t " . __DIR__);
+        break;
+
+    case 'route:list':
+        echo "📋 Rutas registradas:\n";
+        echo "──────────────────────────────\n";
+        $router = require __DIR__ . '/che.php';
+        foreach ($router->getRoutes() as $route) {
+            echo "  {$route['method']}\t{$route['path']}\n";
+        }
+        echo "──────────────────────────────\n";
+        break;
+
+    default:
+        echo <<<HELP
+╔══════════════════════════════════════╗
+║        ⚡ ChePHP — CLI Tool          ║
+╠══════════════════════════════════════╣
+║                                      ║
+║  Uso: php che <comando> [opciones]   ║
+║                                      ║
+║  Comandos:                           ║
+║    migrate                           ║
+║        Ejecuta migraciones pendientes ║
+║                                      ║
+║    rollback                          ║
+║        Revierte ultimo batch          ║
+║                                      ║
+║    serve [puerto] [host]             ║
+║        Inicia servidor de desarrollo  ║
+║                                      ║
+║    route:list                        ║
+║        Lista todas las rutas          ║
+║                                      ║
+║    help                              ║
+║        Muestra esta ayuda             ║
+║                                      ║
+╚══════════════════════════════════════╝
+
+HELP;
+        break;
+}

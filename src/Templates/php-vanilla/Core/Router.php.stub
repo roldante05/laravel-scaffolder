@@ -7,29 +7,104 @@ namespace App\Core;
 class Router
 {
     private array $routes = [];
+    private array $groupStack = [];
+    private array $middlewares = [];
 
-    public function add(string $method, string $path, string $handler): void
+    public function addMiddleware(callable $middleware): void
     {
+        $this->middlewares[] = $middleware;
+    }
+
+    public function group(string $prefix, callable $callback, array $middlewares = []): void
+    {
+        $this->groupStack[] = ['prefix' => $prefix, 'middlewares' => $middlewares];
+        $callback($this);
+        array_pop($this->groupStack);
+    }
+
+    public function get(string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $this->addRoute('GET', $path, $handler, $middlewares);
+    }
+
+    public function post(string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $this->addRoute('POST', $path, $handler, $middlewares);
+    }
+
+    public function put(string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $this->addRoute('PUT', $path, $handler, $middlewares);
+    }
+
+    public function delete(string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $this->addRoute('DELETE', $path, $handler, $middlewares);
+    }
+
+    public function add(string $method, string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $this->addRoute($method, $path, $handler, $middlewares);
+    }
+
+    public function addRoute(string $method, string $path, string|callable $handler, array $middlewares = []): void
+    {
+        $prefix = '';
+        $groupMiddlewares = [];
+
+        foreach ($this->groupStack as $group) {
+            $prefix .= $group['prefix'];
+            $groupMiddlewares = array_merge($groupMiddlewares, $group['middlewares']);
+        }
+
+        $fullPath = $prefix . $path;
+        $fullPath = $fullPath ?: '/';
+
         $this->routes[] = [
-            'method' => $method,
-            'path' => $path,
-            'handler' => $handler
+            'method'      => strtoupper($method),
+            'path'        => $fullPath,
+            'handler'     => $handler,
+            'middlewares' => array_merge($this->middlewares, $groupMiddlewares, $middlewares),
         ];
     }
 
     public function dispatch(): void
     {
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $method = $_SERVER['REQUEST_METHOD'];
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        $uri = rtrim($uri, '/') ?: '/';
 
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $uri) {
-                [$controllerName, $action] = explode('@', $route['handler']);
-                $controllerClass = "App\\Controllers\\$controllerName";
-                
-                if (class_exists($controllerClass)) {
-                    $controller = new $controllerClass();
-                    $controller->$action();
+            if ($route['method'] !== $method && $route['method'] !== 'ANY') {
+                continue;
+            }
+
+            $params = $this->match($route['path'], $uri);
+
+            if ($params !== false) {
+                foreach ($route['middlewares'] as $middleware) {
+                    if ($middleware() === false) {
+                        return;
+                    }
+                }
+
+                $handler = $route['handler'];
+
+                if (is_callable($handler)) {
+                    call_user_func_array($handler, $params);
+                    return;
+                }
+
+                if (is_string($handler) && str_contains($handler, '@')) {
+                    [$class, $action] = explode('@', $handler, 2);
+                    $fullClass = 'App\\Controllers\\' . $class;
+
+                    if (!class_exists($fullClass)) {
+                        $fullClass = $class;
+                    }
+
+                    $controller = new $fullClass();
+                    call_user_func_array([$controller, $action], $params);
                     return;
                 }
             }
@@ -37,5 +112,22 @@ class Router
 
         http_response_code(404);
         echo "404 Not Found";
+    }
+
+    private function match(string $pattern, string $uri): array|false
+    {
+        $regex = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $pattern);
+        $regex = '#^' . $regex . '$#';
+
+        if (preg_match($regex, $uri, $matches)) {
+            return array_filter($matches, fn($key) => is_string($key), ARRAY_FILTER_USE_KEY);
+        }
+
+        return false;
+    }
+
+    public function getRoutes(): array
+    {
+        return $this->routes;
     }
 }

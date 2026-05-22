@@ -62,11 +62,19 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         
         // Check that some key files were created
         $this->assertFileExists($projectName . '/index.php');
+        $this->assertFileExists($projectName . '/che');
+        $this->assertFileExists($projectName . '/che.php');
+        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/config/config.php');
+        $this->assertFileExists($projectName . '/migrations/001_create_users_table.php');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
+        $this->assertFileExists($projectName . '/src/Core/ORM.php');
+        $this->assertFileExists($projectName . '/src/Core/Migration.php');
+        $this->assertFileExists($projectName . '/src/Core/Auth.php');
         $this->assertFileExists($projectName . '/src/Controllers/HomeController.php');
-        $this->assertFileExists($projectName . '/src/Models/User.php'); // login enabled
-        $this->assertFileExists($projectName . '/src/Views/form/login.php'); // login enabled
-        $this->assertFileExists($projectName . '/.env'); // database not none
+        $this->assertFileExists($projectName . '/src/Models/User.php');
+        $this->assertFileExists($projectName . '/src/Views/form/login.php');
+        $this->assertFileExists($projectName . '/.env');
     }
 
     /**
@@ -95,11 +103,20 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         
         // Check that some key files were created (basic structure)
         $this->assertFileExists($projectName . '/index.php');
+        $this->assertFileExists($projectName . '/che');
+        $this->assertFileExists($projectName . '/che.php');
+        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/config/config.php');
+        $this->assertFileExists($projectName . '/migrations');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
+        $this->assertFileExists($projectName . '/src/Core/ORM.php');
+        $this->assertFileExists($projectName . '/src/Core/Migration.php');
         $this->assertFileExists($projectName . '/src/Controllers/HomeController.php');
-        // Note: We do not assert the absence of User.php or auth files here due to test environment variability
-        // But we can check that the form directory does not exist because login is false
+        // Check auth files are NOT generated when login is false
+        $this->assertFileDoesNotExist($projectName . '/src/Core/Auth.php');
+        $this->assertFileDoesNotExist($projectName . '/src/Models/User.php');
         $this->assertFileDoesNotExist($projectName . '/src/Views/form');
+        $this->assertFileDoesNotExist($projectName . '/migrations/001_create_users_table.php');
     }
 
     /**
@@ -128,10 +145,18 @@ class PhpVanillaBuilderTest extends \PHPUnit\Framework\TestCase
         
         // Check that .env file was NOT created (because database is 'none')
         $this->assertFileDoesNotExist($projectName . '/.env');
+        // migrations directory should NOT exist when no database
+        $this->assertFileDoesNotExist($projectName . '/migrations');
         
         // But other files should still be created
         $this->assertFileExists($projectName . '/index.php');
+        $this->assertFileExists($projectName . '/che');
+        $this->assertFileExists($projectName . '/che.php');
+        $this->assertFileExists($projectName . '/app/routes.php');
+        $this->assertFileExists($projectName . '/config/config.php');
         $this->assertFileExists($projectName . '/src/Core/Router.php');
+        $this->assertFileExists($projectName . '/src/Core/ORM.php');
+        $this->assertFileExists($projectName . '/src/Core/Migration.php');
     }
 
     public function test_build_method_returns_one_on_exception(): void

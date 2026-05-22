@@ -1,0 +1,207 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+class Migration
+{
+    private string $migrationsDir;
+    private string $table = '_migrations';
+
+    public function __construct(string $migrationsDir = '')
+    {
+        $this->migrationsDir = $migrationsDir ?: __DIR__ . '/../../migrations';
+    }
+
+    public function init(): void
+    {
+        {{USE_MYSQL}}
+        $sql = "CREATE TABLE IF NOT EXISTS `{$this->table}` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `migration` VARCHAR(255) NOT NULL,
+            `batch` INT NOT NULL DEFAULT 1,
+            `executed_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY `migration_name` (`migration`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        {{/USE_MYSQL}}
+        {{USE_SQLITE}}
+        $sql = "CREATE TABLE IF NOT EXISTS `{$this->table}` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `migration` TEXT NOT NULL,
+            `batch` INTEGER NOT NULL DEFAULT 1,
+            `executed_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (`migration`)
+        )";
+        {{/USE_SQLITE}}
+
+        ORM::query($sql);
+    }
+
+    public function getExecuted(): array
+    {
+        static $executed = null;
+
+        if ($executed !== null) return $executed;
+
+        try {
+            $stmt = ORM::query("SELECT migration FROM `{$this->table}` ORDER BY id ASC");
+            $executed = $stmt ? $stmt->fetchAll(\PDO::FETCH_COLUMN) : [];
+        } catch (\Throwable) {
+            $executed = [];
+        }
+
+        return $executed;
+    }
+
+    public function getAvailable(): array
+    {
+        $files = glob($this->migrationsDir . '/*.php');
+        sort($files);
+        return $files;
+    }
+
+    public function migrate(): array
+    {
+        $this->init();
+        $executed = $this->getExecuted();
+        $available = $this->getAvailable();
+        $results = [];
+
+        $batch = $this->getNextBatch();
+
+        foreach ($available as $file) {
+            $name = basename($file);
+
+            if (in_array($name, $executed, true)) {
+                continue;
+            }
+
+            try {
+                $migration = require $file;
+
+                if ($migration instanceof \Closure) {
+                    $migration('up');
+                } elseif (is_array($migration) && isset($migration['up'])) {
+                    ORM::query($migration['up']);
+                }
+
+                ORM::query(
+                    "INSERT INTO `{$this->table}` (migration, batch) VALUES (?, ?)",
+                    [$name, $batch]
+                );
+
+                $results[] = ['name' => $name, 'status' => 'executed'];
+            } catch (\Throwable $e) {
+                $results[] = ['name' => $name, 'status' => 'error', 'error' => $e->getMessage()];
+            }
+        }
+
+        return $results;
+    }
+
+    public function rollback(): array
+    {
+        $this->init();
+        $results = [];
+
+        $stmt = ORM::query("SELECT MAX(batch) as max_batch FROM `{$this->table}`");
+        $row = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : null;
+        $lastBatch = $row['max_batch'] ?? 0;
+
+        if ($lastBatch === 0) {
+            return [['name' => 'N/A', 'status' => 'nothing to rollback']];
+        }
+
+        $stmt = ORM::query(
+            "SELECT migration FROM `{$this->table}` WHERE batch = ? ORDER BY id DESC",
+            [$lastBatch]
+        );
+        $toRollback = $stmt ? $stmt->fetchAll(\PDO::FETCH_COLUMN) : [];
+
+        foreach ($toRollback as $name) {
+            $file = $this->migrationsDir . '/' . $name;
+
+            if (file_exists($file)) {
+                try {
+                    $migration = require $file;
+
+                    if ($migration instanceof \Closure) {
+                        $migration('down');
+                    } elseif (is_array($migration) && isset($migration['down'])) {
+                        ORM::query($migration['down']);
+                    }
+                } catch (\Throwable $e) {
+                    $results[] = ['name' => $name, 'status' => 'error', 'error' => $e->getMessage()];
+                    continue;
+                }
+            }
+
+            ORM::query("DELETE FROM `{$this->table}` WHERE migration = ?", [$name]);
+            $results[] = ['name' => $name, 'status' => 'rolled back'];
+        }
+
+        return $results;
+    }
+
+    private function getNextBatch(): int
+    {
+        $stmt = ORM::query("SELECT MAX(batch) as max_batch FROM `{$this->table}`");
+        $row = $stmt ? $stmt->fetch(\PDO::FETCH_ASSOC) : null;
+
+        return ($row['max_batch'] ?? 0) + 1;
+    }
+
+    public static function createTable(string $table, array $columns): string
+    {
+        $cols = [];
+        foreach ($columns as $name => $definition) {
+            $cols[] = "`$name` $definition";
+        }
+
+        return "CREATE TABLE IF NOT EXISTS `$table` (\n  " . implode(",\n  ", $cols) . "\n) {{USE_MYSQL}}ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci{{/USE_MYSQL}}";
+    }
+
+    public static function dropTable(string $table): string
+    {
+        return "DROP TABLE IF EXISTS `$table`";
+    }
+
+    public static function addColumn(string $table, string $column, string $definition): string
+    {
+        return "ALTER TABLE `$table` ADD COLUMN `$column` $definition";
+    }
+
+    public static function dropColumn(string $table, string $column): string
+    {
+        return "ALTER TABLE `$table` DROP COLUMN `$column`";
+    }
+
+    public static function addIndex(string $table, string $column, ?string $indexName = null): string
+    {
+        $name = $indexName ?? "idx_{$table}_{$column}";
+        return "CREATE INDEX `$name` ON `$table` (`$column`)";
+    }
+
+    public static function addUniqueIndex(string $table, string $column, ?string $indexName = null): string
+    {
+        $name = $indexName ?? "uq_{$table}_{$column}";
+        return "CREATE UNIQUE INDEX `$name` ON `$table` (`$column`)";
+    }
+
+    public static function dropIndex(string $table, string $indexName): string
+    {
+        return "DROP INDEX `$indexName` ON `$table`";
+    }
+
+    public static function addForeignKey(
+        string $table,
+        string $column,
+        string $referencesTable,
+        string $referencesColumn = 'id',
+        ?string $fkName = null
+    ): string {
+        $name = $fkName ?? "fk_{$table}_{$column}";
+        return "ALTER TABLE `$table` ADD CONSTRAINT `$name` FOREIGN KEY (`$column`) REFERENCES `$referencesTable` (`$referencesColumn`) ON DELETE CASCADE";
+    }
+}

@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * ChePHP - Rutas de la aplicacion
+ *
+ * Define todas las rutas de la aplicacion.
+ * Cada ruta apunta a un metodo de un controlador.
+ * No incluir HTML ni closures — todo va en los controladores.
+ */
+
+$router->get('/', 'HomeController@index');
+$router->get('/about', 'HomeController@about');
+$router->get('/contact', 'HomeController@contact');
+$router->get('/home', 'HomeController@home');
+
+{{USE_LOGIN}}
+$router->get('/login', 'AuthController@showLogin');
+$router->post('/login', 'AuthController@login');
+$router->get('/register', 'AuthController@showRegister');
+$router->post('/register', 'AuthController@register');
+$router->get('/logout', 'AuthController@logout');
+{{/USE_LOGIN}}

@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * ChePHP - Configuracion de la aplicacion
+ *
+ * Las variables de entorno se definen en docker-compose.yml o .env.
+ * Este archivo las centraliza y provee valores por defecto.
+ */
+
+return [
+    'db' => [
+        'connection' => getenv('DB_CONNECTION') ?: '{{DB_CONNECTION}}',
+        'host'       => getenv('DB_HOST') ?: 'localhost',
+        'port'       => getenv('DB_PORT') ?: '3306',
+        'database'   => getenv('DB_DATABASE') ?: '{{DB_DATABASE}}',
+        'username'   => getenv('DB_USERNAME') ?: 'root',
+        'password'   => getenv('DB_PASSWORD') ?: '',
+    ],
+    'app' => [
+        'name'  => '{{PROJECT_NAME}}',
+        'debug' => true,
+    ],
+    'auth' => [
+        'session_name'     => 'chephp_session',
+        'session_lifetime' => 7200,
+    ],
+];
