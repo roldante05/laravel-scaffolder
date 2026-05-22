@@ -91,9 +91,27 @@ class NewCommand extends Command
             return Command::FAILURE;
         }
 
+        if ($projectType === 'PHP Vanilla') {
+            $this->renderChePhpLogo($output);
+        }
+
         $output->writeln(['', '', '', ' <fg=blue>🛠️  Starting installation process...</>', '']);
 
         return $builder->build($projectName, $options, $output);
+    }
+
+    protected function renderChePhpLogo(OutputInterface $output): void
+    {
+        $output->writeln([
+            '',
+            ' <fg=green>    ____ _          ____  _    _ ____    </>',
+            ' <fg=green>   / ___| |__   ___|  _ \| |  | |  _ \  </>',
+            ' <fg=green>  | |   | \'_ \ / _ \ |_) | |__| | |_)  </>',
+            ' <fg=green>  | |___| | | |  __/  __/|  __  |  __/  </>',
+            ' <fg=green>   \____|_| |_|\___|_|   |_|  |_|_|     </>',
+            ' <fg=green>        ORM · Migrations · CLI           </>',
+            '',
+        ]);
     }
 
     protected function renderLogo(OutputInterface $output): void
