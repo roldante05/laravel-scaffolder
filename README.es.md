@@ -75,10 +75,15 @@ Este script construirá tu entorno Docker, instalará las dependencias y te prop
 - **Base de Datos**: Soporte completo para los drivers SQL estándar.
 - **Integración Sail**: Pre-configurado para una gestión sencilla de contenedores.
 
-### PHP Vanilla
-- **Listo para MVC**: Directorios estructurados para una separación clara de responsabilidades.
+### PHP Vanilla (Powered by ChePHP)
+- **ORM ActiveRecord**: Query builder fluido con `find()`, `where()`, `save()`, `delete()` y `paginate()`. Inferencia automática del nombre de tabla desde la clase. Soporta MySQL y SQLite.
+- **Sistema de Migraciones**: Migraciones basadas en archivos con seguimiento por batches y rollback. Escribí archivos PHP con SQL `up`/`down`, ejecutá `php che migrate` para aplicar los cambios.
+- **CLI Tool (`che`)**: Comandos integrados tipo artisan — `php che migrate`, `php che rollback`, `php che serve`, `php che route:list`.
+- **Rutas Limpias**: Las rutas viven en `app/routes.php` sin nada de HTML. Cada ruta apunta a un método de un controlador. Se terminó mezclar HTML con lógica de ruteo.
+- **Configuración Centralizada**: Base de datos, app y autenticación en un solo archivo `config/config.php` con soporte de variables de entorno.
+- **Sistema de Autenticación**: Autenticación por sesión con protección CSRF, hashing Argon2id y cookies seguras.
 - **URLs Limpias**: Configuración automatizada de `.htaccess` para rutas sin extensiones (ej. `/dashboard` en lugar de `dashboard.php`).
-- **Wrapper de PDO**: Interacción segura con la base de datos preparada para MySQL o SQLite.
+- **Dockerizado**: Apache/PHP 8.3 con MySQL o SQLite, listo en segundos.
 
 ---
 
