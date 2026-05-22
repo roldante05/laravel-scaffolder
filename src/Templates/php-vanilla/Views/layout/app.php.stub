@@ -19,11 +19,12 @@
         }
     </script>
     {{/USE_TAILWIND}}
+    <style>html{scroll-behavior:smooth}</style>
     {{USE_BOOTSTRAP}}
     <link href="/src/resources/css/bootstrap.min.css" rel="stylesheet">
     {{/USE_BOOTSTRAP}}
 </head>
-<body class="{{USE_TAILWIND}}bg-slate-100 text-slate-900 antialiased{{/USE_TAILWIND}}">
+<body class="{{USE_TAILWIND}}bg-slate-100 text-slate-900 antialiased m-0{{/USE_TAILWIND}}">
 
     <?php if (isset($_SESSION['user_id'])): ?>
         <!-- Dashboard layout (logged in) -->
@@ -52,32 +53,28 @@
     <?php else: ?>
         <!-- Public layout (not logged in) -->
         {{USE_TAILWIND}}
-        <?php require_once __DIR__ . '/../nav.php'; ?>
-        <main class="relative overflow-hidden pt-16 pb-32 flex items-center min-h-[calc(100vh-64px)]">
-            <div class="container mx-auto px-6 relative z-10">
-                <?= $content ?? '' ?>
-            </div>
-            <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-indigo-50 rounded-full blur-3xl opacity-50 -z-10"></div>
-            <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-violet-50 rounded-full blur-3xl opacity-50 -z-10"></div>
-        </main>
+        <div class="bg-gray-950 min-h-screen relative flex flex-col">
+            <?php require_once __DIR__ . '/../nav.php'; ?>
+            <main class="flex-1 relative">
+                <div class="container mx-auto px-6 relative z-10">
+                    <?= $content ?? '' ?>
+                </div>
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div class="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-indigo-950 rounded-full blur-3xl opacity-30 -z-10"></div>
+                    <div class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-violet-950 rounded-full blur-3xl opacity-30 -z-10"></div>
+                </div>
+            </main>
+        </div>
         {{/USE_TAILWIND}}
         {{USE_BOOTSTRAP}}
-        <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
-            <div class="container">
-                <a class="navbar-brand fw-bold text-primary fs-3" href="/">{{PROJECT_NAME}}</a>
-                <div class="ms-auto d-flex gap-2">
-                    <a href="/about" class="btn btn-link text-decoration-none text-dark fw-medium">About</a>
-                    <a href="/contact" class="btn btn-link text-decoration-none text-dark fw-medium">Contact</a>
-                    <a href="/login" class="btn btn-link text-decoration-none text-dark fw-medium">Login</a>
-                    <a href="/register" class="btn btn-primary rounded-pill px-4 shadow-sm">Registrarse</a>
+        <div class="bg-dark min-vh-100 d-flex flex-column">
+            <?php require_once __DIR__ . '/../nav.php'; ?>
+            <main class="flex-grow-1 py-5">
+                <div class="container">
+                    <?= $content ?? '' ?>
                 </div>
-            </div>
-        </nav>
-        <main class="py-5 mt-5">
-            <div class="container">
-                <?= $content ?? '' ?>
-            </div>
-        </main>
+            </main>
+        </div>
         {{/USE_BOOTSTRAP}}
     <?php endif; ?>
 
