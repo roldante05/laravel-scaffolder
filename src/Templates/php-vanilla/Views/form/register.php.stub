@@ -3,18 +3,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registro - {{PROJECT_NAME}}</title>
+    <title>Register - ChePHP</title>
     <script src="/src/resources/js/tailwindcss.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased flex items-center justify-center min-h-screen px-4 py-12">
     <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
-        <div class="text-center mb-10">
-            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+            <div class="text-center mb-10">
+             <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
                 <span class="text-white text-xl font-bold">P</span>
+             </div>
+             <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Create Account</h2>
+             <p class="text-slate-500 mt-2">Join the platform in seconds</p>
             </div>
-            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Crear cuenta</h2>
-            <p class="text-slate-500 mt-2">Únete a la plataforma en pocos segundos</p>
-        </div>
         
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm font-medium border border-red-100 flex items-center gap-3">
@@ -27,31 +27,31 @@
         
         <form action="/register" method="POST" class="space-y-6">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2">Nombre Completo</label>
-                <input type="text" name="name" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
-                    placeholder="Juan Pérez" required>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2">Correo Electrónico</label>
-                <input type="email" name="email" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
-                    placeholder="nombre@ejemplo.com" required>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2">Contraseña</label>
-                <input type="password" name="password" 
-                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
-                    placeholder="••••••••" required>
-            </div>
+             <div>
+                 <label class="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+                 <input type="text" name="name" 
+                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
+                     placeholder="John Doe" required>
+             </div>
+             <div>
+                 <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
+                 <input type="email" name="email" 
+                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
+                     placeholder="name@example.com" required>
+             </div>
+             <div>
+                 <label class="block text-sm font-bold text-slate-700 mb-2">Password</label>
+                 <input type="password" name="password" 
+                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition-all" 
+                     placeholder="••••••••" required>
+             </div>
             <button type="submit" 
                 class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-200">
-                Empezar Ahora
+                Get Started
             </button>
         </form>
         <p class="mt-8 text-center text-sm text-slate-500">
-            ¿Ya tienes una cuenta? <a href="/login" class="text-indigo-600 font-bold hover:underline">Inicia sesión</a>
+            Already have an account? <a href="/login" class="text-indigo-600 font-bold hover:underline">Sign in</a>
         </p>
     </div>
 </body>
@@ -62,7 +62,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registro - {{PROJECT_NAME}}</title>
+    <title>Register - ChePHP</title>
     <link href="/src/resources/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
@@ -75,8 +75,8 @@
                             <div class="bg-primary d-inline-block rounded-3 p-3 mb-3 shadow-sm">
                                 <div style="width: 24px; height: 24px; background: white;"></div>
                             </div>
-                            <h2 class="fw-bold">Crear cuenta</h2>
-                            <p class="text-muted">Únete a la plataforma en pocos segundos</p>
+                            <h2 class="fw-bold">Create Account</h2>
+                            <p class="text-muted">Join the platform in seconds</p>
                         </div>
                         <?php if (isset($_SESSION['error'])): ?>
                             <div class="alert alert-danger d-flex align-items-center" role="alert">
@@ -88,22 +88,22 @@
                         <?php endif; ?>
                         <form action="/register" method="POST">
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Nombre Completo</label>
-                                <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="Juan Pérez" required>
+                                <label class="form-label fw-semibold">Full Name</label>
+                                <input type="text" name="name" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="John Doe" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Correo electrónico</label>
-                                <input type="email" name="email" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="nombre@ejemplo.com" required>
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="name@example.com" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Contraseña</label>
+                                <label class="form-label fw-semibold">Password</label>
                                 <input type="password" name="password" class="form-control form-control-lg bg-light border-0 rounded-3" placeholder="••••••••" required>
                             </div>
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-                            <button class="btn btn-primary w-100 py-3 rounded-3 fw-bold mt-3 shadow">Empezar Ahora</button>
+                            <button class="btn btn-primary w-100 py-3 rounded-3 fw-bold mt-3 shadow">Get Started</button>
                         </form>
                         <p class="text-center mt-4 mb-0 text-muted">
-                            ¿Ya tienes cuenta? <a href="/login" class="text-primary fw-bold text-decoration-none">Inicia sesión</a>
+                            Already have an account? <a href="/login" class="text-primary fw-bold text-decoration-none">Sign in</a>
                         </p>
                     </div>
                 </div>

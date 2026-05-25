@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * ChePHP - Framework Bootstrap
+ *
+ * Initializes the framework: configuration, database, authentication, and router.
+ * Puede ser usado desde la web (index.php) o desde CLI (che).
+ *
+ * Returns: \App\Core\Router
+ */
+
+use App\Core\Router;
+use App\Security\Helpers\SecurityHelper;
+
+// ─── Security (web requests only) ────────────────────────────────────────────
+if (PHP_SAPI !== 'cli') {
+    SecurityHelper::configureSecureSession();
+    SecurityHelper::applySecurityHeaders();
+}
+
+// ─── Load configuration ──────────────────────────────────────────────────────
+$config = require __DIR__ . '/config/config.php';
+
+// ─── Initialize database ─────────────────────────────────────────────────────
+{{USE_MYSQL}}
+\App\Core\Database::getInstance();
+{{/USE_MYSQL}}
+{{USE_SQLITE}}
+\App\Core\Database::getInstance();
+{{/USE_SQLITE}}
+
+// ─── Initialize authentication ───────────────────────────────────────────────
+{{USE_LOGIN}}
+\App\Core\Auth::init($config['auth'] ?? []);
+{{/USE_LOGIN}}
+
+// ─── Router ──────────────────────────────────────────────────────────────────
+$router = new Router();
+
+// ─── Load application routes ─────────────────────────────────────────────────
+require __DIR__ . '/src/routes/web.php';
+
+return $router;

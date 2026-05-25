@@ -7,21 +7,19 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 
-class HomeController extends Controller
+class ProfileController extends Controller
 {
     public function index(): void
-    {
-        $this->render('welcome', ['title' => 'Welcome to ChePHP']);
-    }
-
-    public function home(): void
     {
         Auth::requireAuth();
 
         $user = Auth::user();
 
-        $this->render('home', [
+        $this->render('profile', [
+            'title' => 'Profile',
             'userName' => $user['name'] ?? 'User',
+            'userEmail' => $user['email'] ?? '',
+            'memberSince' => $user['created_at'] ?? null,
         ]);
     }
 }

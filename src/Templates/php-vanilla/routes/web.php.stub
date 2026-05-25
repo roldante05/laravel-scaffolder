@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * ChePHP - Application Routes
+ *
+ * Defines all application routes.
+ * Each route points to a controller method.
+ * Do not include HTML or closures — everything goes in the controllers.
+ */
+
+$router->get('/', 'HomeController@index');
+$router->get('/home', 'HomeController@home');
+
+{{USE_LOGIN}}
+$router->get('/login', 'AuthController@showLogin');
+$router->post('/login', 'AuthController@login');
+$router->get('/register', 'AuthController@showRegister');
+$router->post('/register', 'AuthController@register');
+$router->get('/logout', 'AuthController@logout');
+$router->get('/profile', 'ProfileController@index');
+{{/USE_LOGIN}}

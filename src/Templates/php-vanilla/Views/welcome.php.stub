@@ -1,47 +1,664 @@
 <?php
 $title = 'Welcome';
-$content = '
-{{USE_TAILWIND}}
-<div class="max-w-3xl">
-    <h1 class="text-6xl font-extrabold tracking-tight mb-6 bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-        Siguiente generación de Scaffolding Factory.
-    </h1>
-    <p class="text-xl text-slate-600 mb-10 leading-relaxed">
-        Construí aplicaciones PHP modernas con una arquitectura limpia y una interfaz premium. Tu proyecto PHP Vanilla ahora tiene superpoderes.
-    </p>
+$lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'es']) ? $_GET['lang'] : 'en';
 
-    <div class="flex items-center gap-4">
-        <a href="/home" class="px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-200">
-            Comenzar Ahora
-        </a>
-        {{USE_LOGIN}}
-        <?php if (!isset($_SESSION["user_id"])): ?>
-        <a href="/login" class="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">
-            Iniciar Sesión
-        </a>
-        <?php endif; ?>
-        {{/USE_LOGIN}}
+ob_start();
+?>
+{{USE_TAILWIND}}
+<style>
+/* Adaptar estilos de documentación (welcome.php) para el tema claro cuando el usuario está logueado */
+.logged-in-layout .text-white:not(pre):not(code):not(pre *):not(code *) {
+    color: #1e293b !important; /* text-slate-800 */
+}
+.logged-in-layout .text-gray-400:not(pre):not(code):not(pre *):not(code *) {
+    color: #475569 !important; /* text-slate-600 */
+}
+.logged-in-layout .text-gray-500:not(pre):not(code):not(pre *):not(code *) {
+    color: #64748b !important; /* text-slate-500 */
+}
+.logged-in-layout .text-gray-300:not(pre):not(code):not(pre *):not(code *) {
+    color: #334155 !important; /* text-slate-700 */
+}
+.logged-in-layout .border-gray-800:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #cbd5e1 !important; /* border-slate-300 */
+}
+.logged-in-layout .border-l-gray-800:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #e2e8f0 !important;
+}
+.logged-in-layout nav.border-l {
+    border-color: #cbd5e1 !important;
+}
+.logged-in-layout .hover\:text-white:hover:not(pre):not(code):not(pre *):not(code *) {
+    color: #0f172a !important; /* hover:text-slate-900 */
+}
+.logged-in-layout code.text-indigo-400 {
+    color: #4f46e5 !important;
+    background-color: #f1f5f9 !important;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.375rem;
+    font-size: 0.875em;
+}
+</style>
+<div class="flex gap-12 max-w-6xl mx-auto px-6 py-16">
+    <div class="flex-1 min-w-0">
+        <div class="text-center mb-16">
+            <img src="/src/resources/img/chephp-logo.png" alt="ChePHP" class="w-32 h-32 mx-auto mb-6">
+             <h1 class="text-4xl font-bold tracking-tight text-white mb-3">ChePHP</h1>
+             <?php if ($lang === 'es'): ?>
+                 <p class="text-lg text-gray-500">Un mini-framework PHP moderno, minimalista y listo para desafíos técnicos reales.</p>
+             <?php else: ?>
+                 <p class="text-lg text-gray-500">A modern, minimalist PHP mini-framework ready for real technical challenges.</p>
+             <?php endif; ?>
+         </div>
+
+        <section class="mb-12 scroll-mt-24" id="que-es-chephp">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">¿Qué es ChePHP?</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    ChePHP nació de una necesidad real: prepararse para <span class="text-gray-300 font-semibold">technical challenges</span> 
+                    en procesos de selección donde las empresas piden un proyecto en PHP puro, sin frameworks. Sin Laravel, sin Symfony — 
+                    solo tú, PHP y el problema a resolver.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    En lugar de arrancar cada challenge desde cero, ChePHP te da una base sólida con MVC, routing, ORM, 
+                    migraciones, autenticación y CLI — todo en <span class="text-gray-300 font-semibold">cero dependencias externas</span>. 
+                    Lo que empezó como un "kit de inicio" para entrevistas se convirtió en un mini-framework funcional.
+                </p>
+                <p class="text-gray-400 leading-relaxed">
+                    Filosofía: <span class="text-gray-300 italic">PHP moderno, sin complicaciones. Listo para construir.</span>
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">What is ChePHP?</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    ChePHP was born out of a real need: to prepare for <span class="text-gray-300 font-semibold">technical challenges</span> 
+                    in recruitment processes where companies ask for a pure PHP project, without frameworks. No Laravel, no Symfony — 
+                    only you, PHP, and the problem to solve.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Instead of starting each challenge from scratch, ChePHP gives you a solid foundation with MVC, routing, ORM, 
+                    migrations, authentication, and CLI — all with <span class="text-gray-300 font-semibold">zero external dependencies</span>. 
+                    What started as a "starter kit" for interviews turned into a functional mini-framework.
+                </p>
+                <p class="text-gray-400 leading-relaxed">
+                    Philosophy: <span class="text-gray-300 italic">Modern PHP, without complications. Ready to build.</span>
+                </p>
+            <?php endif; ?>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="estructura">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Estructura del Proyecto</h2>
+                <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>├── config/
+│   └── config.php           # Configuración centralizada
+├── migrations/               # Migraciones de base de datos
+├── src/
+│   ├── Controllers/          # Controladores de la aplicación
+│   ├── Core/                 # Núcleo del framework
+│   │   ├── Router.php        # Enrutador MVC
+│   │   ├── Controller.php    # Controlador base
+│   │   ├── Auth.php          # Autenticación
+│   │   ├── ORM.php           # Active Record ORM
+│   │   ├── Model.php         # Modelo base
+│   │   ├── Database.php      # Conexión PDO
+│   │   └── Migration.php     # Sistema de migraciones
+│   ├── Models/               # Modelos de la aplicación
+│   ├── Views/                # Plantillas PHP
+│   │   ├── layout/           # Layout (sidebar, header, app)
+│   │   └── form/             # Formularios (login, registro)
+│   ├── routes/
+│   │   └── web.php           # Definición de rutas
+│   ├── resources/            # Assets (CSS, JS)
+│   └── Security/
+│       └── Helpers/          # Helpers de seguridad (CSRF, hashing, XSS)
+├── che                       # CLI herramienta
+└── index.php                 # Punto de entrada</code></pre>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Project Structure</h2>
+                <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>├── config/
+│   └── config.php           # Centralized configuration
+├── migrations/               # Database migrations
+├── src/
+│   ├── Controllers/          # Application controllers
+│   ├── Core/                 # Framework core
+│   │   ├── Router.php        # MVC Router
+│   │   ├── Controller.php    # Base Controller
+│   │   ├── Auth.php          # Authentication
+│   │   ├── ORM.php           # Active Record ORM
+│   │   ├── Model.php         # Base Model
+│   │   ├── Database.php      # PDO Connection
+│   │   └── Migration.php     # Migration system
+│   ├── Models/               # Application models
+│   ├── Views/                # PHP templates
+│   │   ├── layout/           # Layout (sidebar, header, app)
+│   │   └── form/             # Forms (login, register)
+│   ├── routes/
+│   │   └── web.php           # Route definitions
+│   ├── resources/            # Assets (CSS, JS)
+│   └── Security/
+│       └── Helpers/          # Security helpers (CSRF, hashing, XSS)
+├── che                       # CLI tool
+└── index.php                 # Entry point</code></pre>
+            <?php endif; ?>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="cli">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">CLI — Comandos</h2>
+                <p class="text-gray-400 leading-relaxed mb-6">
+                    ChePHP incluye una CLI propia (<code class="text-indigo-400">che</code>) para las tareas del día a día:
+                </p>
+
+                <div class="space-y-4">
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che migrate</span>
+                            <span class="text-gray-400 text-sm">Ejecuta todas las migraciones pendientes. Crea las tablas en orden.</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che rollback</span>
+                            <span class="text-gray-400 text-sm">Revierte el último batch de migraciones.</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che serve</span>
+                            <span class="text-gray-400 text-sm">Inicia el servidor de desarrollo en <code class="text-gray-300">localhost:8080</code> (ideal para SQLite / desarrollo rápido).</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che route:list</span>
+                            <span class="text-gray-400 text-sm">Lista todas las rutas registradas con sus métodos HTTP.</span>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">CLI — Commands</h2>
+                <p class="text-gray-400 leading-relaxed mb-6">
+                    ChePHP includes its own CLI (<code class="text-indigo-400">che</code>) for day-to-day tasks:
+                </p>
+
+                <div class="space-y-4">
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che migrate</span>
+                            <span class="text-gray-400 text-sm">Executes all pending migrations. Creates tables in order.</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che rollback</span>
+                            <span class="text-gray-400 text-sm">Rolls back the last batch of migrations.</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che serve</span>
+                            <span class="text-gray-400 text-sm">Starts the development server at <code class="text-gray-300">localhost:8080</code> (ideal for SQLite / quick development).</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                        <div class="flex items-start gap-4">
+                            <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che route:list</span>
+                            <span class="text-gray-400 text-sm">Lists all registered routes along with their HTTP methods.</span>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="routing">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Routing</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Las rutas se definen en <code class="text-indigo-400">src/routes/web.php</code>. El enrutador soporta 
+                    los métodos HTTP estándar y parámetros dinámicos en la URL:
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Routing</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Routes are defined in <code class="text-indigo-400">src/routes/web.php</code>. The router supports 
+                    standard HTTP methods and dynamic URL parameters:
+                </p>
+            <?php endif; ?>
+            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>&lt;?php
+ 
+$router->get("/", "HomeController@index");
+$router->get("/home", "HomeController@home");
+$router->post("/login", "AuthController@login");
+ 
+$router->get("/posts/{id}", "PostController@show");
+$router->get("/posts/{id}/edit", "PostController@edit");</code></pre>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="controladores">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Controladores</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Cada controlador extiende la clase base <code class="text-indigo-400">Controller</code>, 
+                    que provee métodos para renderizar vistas y redirigir:
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Controllers</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Each controller extends the <code class="text-indigo-400">Controller</code> base class, 
+                    which provides methods for rendering views and redirecting:
+                </p>
+            <?php endif; ?>
+            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>&lt;?php
+ 
+namespace App\Controllers;
+ 
+use App\Core\Controller;
+use App\Core\Auth;
+ 
+class HomeController extends Controller
+{
+    public function index(): void
+    {
+        $this->render("welcome", [
+            "title" => "Welcome"
+        ]);
+    }
+ 
+    public function home(): void
+    {
+        Auth::requireAuth();
+        $this->render("home", [
+            "user" => Auth::user()["name"]
+        ]);
+    }
+}</code></pre>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="vistas">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Vistas</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Las vistas son archivos PHP planos en <code class="text-indigo-400">src/Views/</code>. 
+                    El método <code class="text-indigo-400">$this->render()</code> del controlador se encarga de renderizar la vista y aplicar el layout automáticamente.
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Views</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Views are flat PHP files in <code class="text-indigo-400">src/Views/</code>. 
+                    The controller's <code class="text-indigo-400">$this->render()</code> method handles view rendering and applies the layout automatically.
+                </p>
+            <?php endif; ?>
+            <?php if ($lang === 'es'): ?>
+                <p class="text-gray-400 leading-relaxed mt-4">
+                    El layout maneja dos modos: <span class="text-gray-300 font-semibold">dashboard</span> (usuario logueado, 
+                    con sidebar y header) y <span class="text-gray-300 font-semibold">público</span> (landing page sin autenticación).
+                </p>
+            <?php else: ?>
+                <p class="text-gray-400 leading-relaxed mt-4">
+                    The layout handles two modes: <span class="text-gray-300 font-semibold">dashboard</span> (logged-in user, 
+                    with sidebar and header) and <span class="text-gray-300 font-semibold">public</span> (landing page without authentication).
+                </p>
+            <?php endif; ?>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="orm-y-modelos">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">ORM y Modelos</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    ChePHP incluye un ORM estilo Active Record con métodos fluidos para consultas:
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">ORM & Models</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    ChePHP includes an Active Record-style ORM with fluent methods for queries:
+                </p>
+            <?php endif; ?>
+            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>$users = User::where("active", true)
+    ->orderBy("created_at", "desc")
+    ->get();
+ 
+$user = User::find(1);
+$user->name = "New Name";
+$user->save();
+ 
+$deleted = User::delete(1);</code></pre>
+            <?php if ($lang === 'es'): ?>
+                <p class="text-gray-400 leading-relaxed mt-4">
+                    Los modelos extienden <code class="text-indigo-400">ORM</code> y heredan toda la funcionalidad 
+                    de base de datos automáticamente.
+                </p>
+            <?php else: ?>
+                <p class="text-gray-400 leading-relaxed mt-4">
+                    Models extend <code class="text-indigo-400">ORM</code> and inherit all database functionality automatically.
+                </p>
+            <?php endif; ?>
+        </section>
+
+        <section class="mb-12 scroll-mt-24" id="migraciones">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Migraciones</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Las migraciones se definen como clases PHP en <code class="text-indigo-400">migrations/</code>. 
+                    Cada migración tiene métodos <code class="text-gray-300">up()</code> y <code class="text-gray-300">down()</code>:
+                </p>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Migrations</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Migrations are defined as PHP classes in <code class="text-indigo-400">migrations/</code>. 
+                    Each migration has <code class="text-gray-300">up()</code> and <code class="text-gray-300">down()</code> methods:
+                </p>
+            <?php endif; ?>
+            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>&lt;?php
+ 
+return [
+    "up" => function (PDO \$db) {
+        \$db->exec("CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+    },
+    "down" => function (PDO \$db) {
+        \$db->exec("DROP TABLE IF EXISTS users");
+    },
+];</code></pre>
+        </section>
+
+        <section class="mb-8 scroll-mt-24" id="autenticacion">
+            <?php if ($lang === 'es'): ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Autenticación y Seguridad</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    El sistema de auth usa sesiones seguras con <span class="text-gray-300 font-semibold">Argon2id</span> 
+                    para hashing de contraseñas, regeneración de ID de sesión tras login, y protección CSRF en todos 
+                    los formularios.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Los helpers de seguridad incluyen:
+                </p>
+                <ul class="list-disc list-inside text-gray-400 space-y-2 mb-6">
+                    <li><span class="text-gray-300">CSRF</span> — tokens por sesión para prevenir ataques</li>
+                    <li><span class="text-gray-300">XSS</span> — escape automático en todas las vistas via <code class="text-indigo-400">SecurityHelper::escapeHtml()</code></li>
+                    <li><span class="text-gray-300">Headers HTTP</span> — Content-Security-Policy, X-Frame-Options, HSTS</li>
+                    <li><span class="text-gray-300">URL validation</span> — previene open redirects en <code class="text-indigo-400">redirect()</code></li>
+                </ul>
+            <?php else: ?>
+                <h2 class="text-2xl font-bold text-white mb-4">Authentication & Security</h2>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    The auth system uses secure sessions with <span class="text-gray-300 font-semibold">Argon2id</span> 
+                    for password hashing, session ID regeneration upon login, and CSRF protection on all forms.
+                </p>
+                <p class="text-gray-400 leading-relaxed mb-4">
+                    Security helpers include:
+                </p>
+                <ul class="list-disc list-inside text-gray-400 space-y-2 mb-6">
+                    <li><span class="text-gray-300">CSRF</span> — per-session tokens to prevent attacks</li>
+                    <li><span class="text-gray-300">XSS</span> — automatic escape in all views via <code class="text-indigo-400">SecurityHelper::escapeHtml()</code></li>
+                    <li><span class="text-gray-300">HTTP Headers</span> — Content-Security-Policy, X-Frame-Options, HSTS</li>
+                    <li><span class="text-gray-300">URL validation</span> — prevents open redirects in <code class="text-indigo-400">redirect()</code></li>
+                </ul>
+            <?php endif; ?>
+            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>// Authentication
+\$user = Auth::attempt("email@example.com", "password123");
+Auth::register(["name" => "...", "email" => "...", "password" => "..."]);
+Auth::logout();
+ 
+// Verification
+if (Auth::check()) { /* ... */ }
+\$user = Auth::user(); // ["id" => 1, "name" => "...", "email" => "..."]</code></pre>
+        </section>
+    </div>
+
+    <div class="w-64 flex-shrink-0 hidden lg:block">
+        <nav class="sticky top-24 space-y-1 border-l border-gray-800 pl-6">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+                <?= $lang === 'es' ? 'En esta página' : 'On this page' ?>
+            </p>
+            <a href="#que-es-chephp" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? '¿Qué es ChePHP?' : 'What is ChePHP?' ?></a>
+            <a href="#estructura" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Estructura del Proyecto' : 'Project Structure' ?></a>
+            <a href="#cli" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'CLI — Comandos' : 'CLI — Commands' ?></a>
+            <a href="#routing" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Routing' : 'Routing' ?></a>
+            <a href="#controladores" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Controladores' : 'Controllers' ?></a>
+            <a href="#vistas" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Vistas' : 'Views' ?></a>
+            <a href="#orm-y-modelos" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'ORM y Modelos' : 'ORM & Models' ?></a>
+            <a href="#migraciones" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Migraciones' : 'Migrations' ?></a>
+            <a href="#autenticacion" class="block text-sm text-gray-400 hover:text-white transition-colors py-1.5"><?= $lang === 'es' ? 'Autenticación y Seguridad' : 'Auth & Security' ?></a>
+
+            <div class="border-t border-gray-800 pt-4 mt-4">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Language</p>
+                <a href="?lang=es" class="block text-sm <?= $lang === 'es' ? 'text-indigo-400 font-semibold' : 'text-gray-400 hover:text-white' ?> transition-colors py-1.5">Español</a>
+                <a href="?lang=en" class="block text-sm <?= $lang === 'en' ? 'text-indigo-400 font-semibold' : 'text-gray-400 hover:text-white' ?> transition-colors py-1.5">English</a>
+            </div>
+        </nav>
     </div>
 </div>
 {{/USE_TAILWIND}}
 {{USE_BOOTSTRAP}}
-<header class="py-5 mt-5">
-    <div class="container text-center">
-        <h1 class="display-3 fw-extrabold text-dark mb-4">La evolución de tu <span class="text-primary">Workflow</span></h1>
-        <p class="lead text-secondary mx-auto mb-5" style="max-width: 700px;">
-            Optimiza tus proyectos con nuestra herramienta integral. Diseñada para desarrolladores que buscan velocidad y estabilidad.
-        </p>
-        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-            <a href="/home" class="btn btn-primary btn-lg px-5 py-3 rounded-4 fw-bold shadow">Empezar ahora</a>
-            {{USE_LOGIN}}
-            <?php if (!isset($_SESSION["user_id"])): ?>
-            <a href="/about" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-4 fw-bold">Ver funciones</a>
-            <?php endif; ?>
-            {{/USE_LOGIN}}
+<style>
+/* Adaptar estilos de documentación para Bootstrap claro cuando el usuario está logueado */
+.logged-in-layout .text-white:not(pre):not(code):not(pre *):not(code *),
+.logged-in-layout .text-light:not(pre):not(code):not(pre *):not(code *) {
+    color: #1e293b !important;
+}
+.logged-in-layout .text-secondary:not(pre):not(code):not(pre *):not(code *) {
+    color: #475569 !important;
+}
+.logged-in-layout .text-light-emphasis:not(pre):not(code):not(pre *):not(code *) {
+    color: #334155 !important;
+}
+.logged-in-layout .border-secondary:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #cbd5e1 !important;
+}
+</style>
+<div class="container-fluid py-5 text-light">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-white mb-3">ChePHP</h1>
+                <?php if ($lang === 'es'): ?>
+                    <p class="lead text-secondary">Un mini-framework PHP moderno, minimalista y listo para desafíos técnicos reales.</p>
+                <?php else: ?>
+                    <p class="lead text-secondary">A modern, minimalist PHP mini-framework ready for real technical challenges.</p>
+                <?php endif; ?>
+
+            </div>
+
+             <section class="mb-5" id="que-es-chephp" style="scroll-margin-top: 100px;">
+                 <h2 class="h3 fw-bold text-white mb-3">What is ChePHP?</h2>
+                 <p class="text-secondary">ChePHP was born out of a real need: to prepare for <strong class="text-white">technical challenges</strong> in recruitment processes where companies ask for a pure PHP project, without frameworks. No Laravel, no Symfony — only you, PHP, and the problem to solve.</p>
+                 <p class="text-secondary">Instead of starting each challenge from scratch, ChePHP gives you a solid foundation with MVC, routing, ORM, migrations, authentication, and CLI — all with <strong class="text-white">zero external dependencies</strong>. What started as a "starter kit" for interviews turned into a functional mini-framework.</p>
+                 <p class="text-secondary fst-italic">Modern PHP, without complications. Ready to build.</p>
+             </section>
+
+            <section class="mb-5" id="estructura" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Estructura del Proyecto</h2>
+                    <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>├── config/
+│   └── config.php
+├── migrations/
+├── src/
+│   ├── Controllers/
+│   ├── Core/ (Router, Controller, Auth, ORM, Database, Migration)
+│   ├── Models/
+│   ├── Views/
+│   │   ├── layout/
+│   │   └── form/
+│   ├── routes/web.php
+│   └── Security/Helpers/
+├── che
+└── index.php</code></pre>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Project Structure</h2>
+                    <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>├── config/
+│   └── config.php
+├── migrations/
+├── src/
+│   ├── Controllers/
+│   ├── Core/ (Router, Controller, Auth, ORM, Database, Migration)
+│   ├── Models/
+│   ├── Views/
+│   │   ├── layout/
+│   │   └── form/
+│   ├── routes/web.php
+│   └── Security/Helpers/
+├── che
+└── index.php</code></pre>
+                <?php endif; ?>
+            </section>
+
+            <section class="mb-5" id="cli" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">CLI — Comandos</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><code class="text-primary">php che migrate</code> <span class="text-secondary">— Ejecuta migraciones pendientes</span></li>
+                        <li class="mb-2"><code class="text-primary">php che rollback</code> <span class="text-secondary">— Revierte el último batch</span></li>
+                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Inicia servidor de desarrollo (ideal para SQLite / desarrollo rápido)</span></li>
+                        <li class="mb-2"><code class="text-primary">php che route:list</code> <span class="text-secondary">— Lista rutas registradas</span></li>
+                    </ul>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">CLI — Commands</h2>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><code class="text-primary">php che migrate</code> <span class="text-secondary">— Executes pending migrations</span></li>
+                        <li class="mb-2"><code class="text-primary">php che rollback</code> <span class="text-secondary">— Rolls back the last batch</span></li>
+                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Starts the development server (ideal for SQLite / quick development)</span></li>
+                        <li class="mb-2"><code class="text-primary">php che route:list</code> <span class="text-secondary">— Lists registered routes</span></li>
+                    </ul>
+                <?php endif; ?>
+            </section>
+
+            <section class="mb-5" id="routing" style="scroll-margin-top: 100px;">
+                <h2 class="h3 fw-bold text-white mb-3">Routing</h2>
+                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>&lt;?php
+$router-&gt;get("/", "HomeController@index");
+$router-&gt;post("/login", "AuthController@login");
+$router-&gt;get("/posts/{id}", "PostController@show");</code></pre>
+            </section>
+
+            <section class="mb-5" id="controladores" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Controladores</h2>
+                    <p class="text-secondary mb-3">Cada controlador extiende <code class="text-primary">Controller</code> y usa <code class="text-primary">$this-&gt;render()</code> para mostrar vistas:</p>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Controllers</h2>
+                    <p class="text-secondary mb-3">Each controller extends <code class="text-primary">Controller</code> and uses <code class="text-primary">$this-&gt;render()</code> to display views:</p>
+                <?php endif; ?>
+                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>&lt;?php
+
+namespace App\Controllers;
+
+use App\Core\Controller;
+use App\Core\Auth;
+
+class HomeController extends Controller
+{
+    public function index(): void
+    {
+        $this-&gt;render("welcome");
+    }
+
+    public function home(): void
+    {
+        Auth::requireAuth();
+        $this-&gt;render("home", [
+            "user" =&gt; Auth::user()["name"]
+        ]);
+    }
+}</code></pre>
+            </section>
+
+             <section class="mb-5" id="vistas" style="scroll-margin-top: 100px;">
+                 <?php if ($lang === 'es'): ?>
+                     <h2 class="h3 fw-bold text-white mb-3">Vistas</h2>
+                     <p class="text-secondary mb-3">El método <code class="text-primary">$this->render()</code> del controlador se encarga de renderizar la vista y aplicar el layout automáticamente.</p>
+                 <?php else: ?>
+                     <h2 class="h3 fw-bold text-white mb-3">Views</h2>
+                     <p class="text-secondary mb-3">The controller's <code class="text-primary">$this->render()</code> method handles view rendering and applies the layout automatically.</p>
+                 <?php endif; ?>
+                 <?php if ($lang === 'es'): ?>
+                     <p class="text-secondary mb-3">El layout maneja dos modos: <span class="text-secondary fw-bold">dashboard</span> (usuario logueado, con sidebar y header) y <span class="text-secondary fw-bold">público</span> (landing page sin autenticación).</p>
+                 <?php else: ?>
+                     <p class="text-secondary mb-3">The layout handles two modes: <span class="text-secondary fw-bold">dashboard</span> (logged-in user, with sidebar and header) and <span class="text-secondary fw-bold">public</span> (landing page without authentication).</p>
+                 <?php endif; ?>
+             </section>
+
+            <section class="mb-5" id="orm-y-modelos" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">ORM y Modelos</h2>
+                    <p class="text-secondary mb-3">Active Record ORM con consultas fluidas:</p>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">ORM & Models</h2>
+                    <p class="text-secondary mb-3">Active Record ORM with fluent queries:</p>
+                <?php endif; ?>
+                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>$users = User::where("active", true)-&gt;get();
+$user = User::find(1);
+$user-&gt;name = "New Name";
+$user-&gt;save();</code></pre>
+            </section>
+
+            <section class="mb-5" id="migraciones" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Migraciones</h2>
+                    <p class="text-secondary mb-3">Clases PHP con métodos <code class="text-primary">up()</code> y <code class="text-primary">down()</code>:</p>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Migrations</h2>
+                    <p class="text-secondary mb-3">PHP classes with <code class="text-primary">up()</code> and <code class="text-primary">down()</code> methods:</p>
+                <?php endif; ?>
+                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>return [
+    "up" =&gt; function (PDO $db) {
+        $db-&gt;exec("CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )");
+    },
+    "down" =&gt; function (PDO $db) {
+        $db-&gt;exec("DROP TABLE IF EXISTS users");
+    },
+];</code></pre>
+            </section>
+
+            <section class="mb-5" id="autenticacion" style="scroll-margin-top: 100px;">
+                <?php if ($lang === 'es'): ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Autenticación y Seguridad</h2>
+                    <p class="text-secondary mb-3">Sesiones seguras con Argon2id, CSRF y XSS protection:</p>
+                <?php else: ?>
+                    <h2 class="h3 fw-bold text-white mb-3">Auth & Security</h2>
+                    <p class="text-secondary mb-3">Secure sessions with Argon2id, CSRF and XSS protection:</p>
+                <?php endif; ?>
+                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>Auth::attempt("email@example.com", "password");
+Auth::register(["name" =&gt; "...", "email" =&gt; "...", "password" =&gt; "..."]);
+Auth::check();
+Auth::user();</code></pre>
+            </section>
+        </div>
+
+        <div class="col-lg-3 offset-lg-1 d-none d-lg-block">
+            <div class="position-sticky" style="top: 100px;">
+                <p class="text-uppercase small fw-bold text-secondary mb-3"><?= $lang === 'es' ? 'En esta página' : 'On this page' ?></p>
+                <nav class="d-flex flex-column gap-2">
+                    <a href="#que-es-chephp" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? '¿Qué es ChePHP?' : 'What is ChePHP?' ?></a>
+                    <a href="#estructura" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Estructura del Proyecto' : 'Project Structure' ?></a>
+                    <a href="#cli" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'CLI — Comandos' : 'CLI — Commands' ?></a>
+                    <a href="#routing" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Routing' : 'Routing' ?></a>
+                    <a href="#controladores" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Controladores' : 'Controllers' ?></a>
+                    <a href="#vistas" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Vistas' : 'Views' ?></a>
+                    <a href="#orm-y-modelos" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'ORM y Modelos' : 'ORM & Models' ?></a>
+                    <a href="#migraciones" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Migraciones' : 'Migrations' ?></a>
+                    <a href="#autenticacion" class="text-decoration-none small text-light-emphasis"><?= $lang === 'es' ? 'Autenticación y Seguridad' : 'Auth & Security' ?></a>
+
+                    <hr class="text-secondary my-3">
+                    <p class="text-uppercase small fw-bold text-secondary mb-2">Language</p>
+                    <a href="?lang=es" class="text-decoration-none small <?= $lang === 'es' ? 'text-primary fw-semibold' : 'text-light-emphasis' ?>">Español</a><br>
+                    <a href="?lang=en" class="text-decoration-none small <?= $lang === 'en' ? 'text-primary fw-semibold' : 'text-light-emphasis' ?>">English</a>
+                </nav>
+            </div>
         </div>
     </div>
-</header>
+</div>
 {{/USE_BOOTSTRAP}}
-';
+<?php
+$content = ob_get_clean();
 require_once __DIR__ . '/layout/app.php';
 ?>

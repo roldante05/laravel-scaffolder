@@ -1,32 +1,32 @@
 {{USE_TAILWIND}}
-<aside class="w-64 bg-slate-900 text-white hidden md:block min-h-screen fixed">
+<aside class="w-64 bg-slate-900 text-white hidden md:block min-h-screen fixed left-0 top-0 z-50">
     <div class="p-6 text-2xl font-bold flex items-center gap-2">
         <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
             <span class="text-white text-sm">P</span>
         </div>
-        {{PROJECT_NAME}}
+        ChePHP
     </div>
     <nav class="mt-10 space-y-2 px-4">
+        <a href="/" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/' ? 'bg-indigo-600' : '' ?>">Docs ChePHP</a>
         <a href="/home" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/home' ? 'bg-indigo-600' : '' ?>">Dashboard</a>
-        <a href="/about" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/about' ? 'bg-slate-800' : '' ?>">About</a>
-        <a href="/contact" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/contact' ? 'bg-slate-800' : '' ?>">Contact</a>
+        <a href="/profile" class="block px-4 py-2 hover:bg-slate-800 rounded-lg transition <?= $_SERVER['REQUEST_URI'] === '/profile' ? 'bg-indigo-600' : '' ?>">Profile</a>
     </nav>
 </aside>
 {{/USE_TAILWIND}}
 {{USE_BOOTSTRAP}}
 <nav class="col-md-3 col-lg-2 d-md-block bg-white sidebar vh-100 border-end p-3 position-fixed">
     <div class="mb-4 px-3">
-        <span class="fs-4 fw-bold text-primary">{{PROJECT_NAME}}</span>
+        <span class="fs-4 fw-bold text-primary">ChePHP</span>
     </div>
     <ul class="nav flex-column gap-2">
+        <li class="nav-item">
+            <a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/' ? 'active bg-primary text-white rounded-3 p-3' : 'text-dark p-3 hover-bg-light' ?>" href="/">Docs ChePHP</a>
+        </li>
         <li class="nav-item">
             <a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/home' ? 'active bg-primary text-white rounded-3 p-3' : 'text-dark p-3 hover-bg-light' ?>" href="/home">Dashboard</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/about' ? 'active bg-primary text-white rounded-3 p-3' : 'text-dark p-3 hover-bg-light' ?>" href="/about">Sobre Nosotros</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/contact' ? 'active bg-primary text-white rounded-3 p-3' : 'text-dark p-3 hover-bg-light' ?>" href="/contact">Contacto</a>
+            <a class="nav-link <?= $_SERVER['REQUEST_URI'] === '/profile' ? 'active bg-primary text-white rounded-3 p-3' : 'text-dark p-3 hover-bg-light' ?>" href="/profile">Profile</a>
         </li>
     </ul>
 </nav>

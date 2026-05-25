@@ -1,63 +1,48 @@
 #!/bin/bash
 set -e
 
-# Nos aseguramos de estar en la raíz del proyecto (un nivel arriba de scripts/)
 cd "$(dirname "$0")/.."
 
-echo "🚀 PHP Vanilla Project - Install script"
+echo "🚀 ChePHP Project - Install script"
 echo "=========================================="
 
-# Check Docker
 if ! command -v docker &> /dev/null; then
     echo "❌ Docker not found. Please install it first."
     exit 1
 fi
 
-# Build and start containers
 echo "🐳 Starting containers..."
 docker compose up -d --build
 
-# Install composer dependencies
 echo "📦 Installing PHP dependencies..."
 docker compose exec app composer install
 
-{{USE_MYSQL}}
-{{USE_LOGIN}}
-echo "⏳ Waiting for MySQL to be ready..."
-sleep 15
-echo "🗄️ Creating users table..."
-docker compose exec app php -r "
-\$pdo = new PDO('mysql:host=mysql;dbname={{DB_DATABASE}}', 'user', 'password');
-\$pdo->exec('CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)');
-echo 'Users table created successfully';
-"
-{{/USE_LOGIN}}
-{{/USE_MYSQL}}
-
 {{USE_SQLITE}}
-{{USE_LOGIN}}
-echo "🗄️ Creating SQLite database directory and users table..."
+echo "🗄️ Setting up SQLite database directory..."
 docker compose exec app mkdir -p database
 docker compose exec app chmod -R 777 database
-docker compose exec app php -r "
-\$pdo = new PDO('sqlite:/var/www/html/database/database.sqlite');
-\$pdo->exec('CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-)');
-echo 'Users table created successfully';
-"
-docker compose exec app chmod 666 database/database.sqlite
-{{/USE_LOGIN}}
+{{/USE_SQLITE}}
+
+{{USE_MYSQL}}
+echo "⏳ Waiting for MySQL to be ready..."
+sleep 15
+{{/USE_MYSQL}}
+
+{{!USE_MYSQL}}
+{{!USE_SQLITE}}
+echo "ℹ️  No database configured. Skipping migrations."
+{{/!USE_SQLITE}}
+{{/!USE_MYSQL}}
+
+{{USE_MYSQL}}
+echo "📦 Running migrations..."
+docker compose exec app php che migrate
+{{/USE_MYSQL}}
+{{USE_SQLITE}}
+echo "📦 Running migrations..."
+docker compose exec app php che migrate
+echo "🗄️ Setting database file permissions..."
+docker compose exec app chmod 666 database/database.sqlite 2>/dev/null || true
 {{/USE_SQLITE}}
 
 echo ""
@@ -68,3 +53,5 @@ echo "💡 Useful commands:"
 echo "   - docker compose up -d (Start containers)"
 echo "   - docker compose down (Stop containers)"
 echo "   - docker compose exec app bash (Access container)"
+echo "   - docker compose exec app php che migrate (Run migrations)"
+echo "   - docker compose exec app php che rollback (Rollback migrations)"

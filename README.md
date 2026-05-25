@@ -193,8 +193,15 @@ DB_PASSWORD=password
 
 ### Vanilla PHP
 - **MVC Ready**: Structured directories for a clean separation of concerns.
+### Vanilla PHP (Powered by ChePHP)
+- **ActiveRecord ORM**: Fluent query builder with `find()`, `where()`, `save()`, `delete()`, and `paginate()`. Automatic table name inference from class names. Supports MySQL and SQLite.
+- **Migration System**: File-based migrations with batch tracking and rollback. Write simple PHP files with `up`/`down` SQL, then run `php che migrate` to apply changes.
+- **CLI Tool (`che`)**: Built-in artisan-like commands — `php che migrate`, `php che rollback`, `php che serve`, `php che route:list`.
+- **Clean Routes**: Routes live in `app/routes.php` with zero inline HTML. Every route points to a Controller method. No more mixing HTML with routing logic.
+- **Centralized Config**: Database, app, and auth settings in a single `config/config.php` file with environment variable overrides.
+- **Auth System**: Session-based authentication with CSRF protection, Argon2id hashing, and secure cookie configuration.
 - **Clean URLs**: Automated `.htaccess` configuration for extension-less routing (e.g., `/dashboard` instead of `dashboard.php`).
-- **PDO Wrapper**: Secure database interaction prepared for MySQL or SQLite.
+- **Dockerized**: Apache/PHP 8.3 with MySQL or SQLite, ready in seconds.
 
 ---
 

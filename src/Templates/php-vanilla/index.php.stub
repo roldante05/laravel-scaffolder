@@ -4,27 +4,6 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Core\Router;
-use App\Security\Helpers\SecurityHelper;
-
-// Configurar sesión segura y aplicar headers de seguridad
-SecurityHelper::configureSecureSession();
-SecurityHelper::applySecurityHeaders();
-
-$router = new Router();
-
-// Routes
-$router->add('GET', '/', 'HomeController@index');
-$router->add('GET', '/about', 'HomeController@about');
-$router->add('GET', '/contact', 'HomeController@contact');
-$router->add('GET', '/home', 'HomeController@home');
-
-{{USE_LOGIN}}
-$router->add('GET', '/login', 'AuthController@showLogin');
-$router->add('POST', '/login', 'AuthController@login');
-$router->add('GET', '/register', 'AuthController@showRegister');
-$router->add('POST', '/register', 'AuthController@register');
-$router->add('GET', '/logout', 'AuthController@logout');
-{{/USE_LOGIN}}
+$router = require __DIR__ . '/che.php';
 
 $router->dispatch();

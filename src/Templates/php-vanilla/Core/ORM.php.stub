@@ -1,0 +1,392 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core;
+
+use PDO;
+
+class ORM
+{
+    protected static array $queries = [];
+
+    protected string $table;
+    protected string $primaryKey = 'id';
+    protected array $fillable = [];
+    protected array $data = [];
+    protected array $dirty = [];
+    protected array $conditions = [];
+    protected array $bindings = [];
+    protected ?string $order = null;
+    protected ?int $limit = null;
+    protected ?int $offset = null;
+    protected bool $exists = false;
+
+    // ─── Database ─────────────────────────────────────────────────────────
+
+    protected static function pdo(): PDO
+    {
+        return Database::getInstance();
+    }
+
+    public static function query(string $sql, array $params = []): \PDOStatement|false
+    {
+        static::$queries[] = $sql;
+        $stmt = static::pdo()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+
+    public static function getQueries(): array
+    {
+        return static::$queries;
+    }
+
+    // ─── Constructor ──────────────────────────────────────────────────────
+
+    public function __construct(array $data = [])
+    {
+        if (empty($this->table)) {
+            $class = (new \ReflectionClass($this))->getShortName();
+            $this->table = static::tableize($class);
+        }
+        $this->data = $data;
+    }
+
+    protected static function tableize(string $name): string
+    {
+        $snake = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name));
+        if (!str_ends_with($snake, 's')) {
+            $snake .= 's';
+        }
+        return $snake;
+    }
+
+    // ─── Magic accessors ──────────────────────────────────────────────────
+
+    public function __set(string $name, mixed $value): void
+    {
+        $this->data[$name] = $value;
+        $this->dirty[$name] = true;
+    }
+
+    public function __get(string $name): mixed
+    {
+        return $this->data[$name] ?? null;
+    }
+
+    public function __isset(string $name): bool
+    {
+        return isset($this->data[$name]);
+    }
+
+    public function fill(array $data): static
+    {
+        foreach ($data as $key => $value) {
+            // Mass Assignment protection
+            if (!empty($this->fillable) && !in_array($key, $this->fillable, true)) {
+                continue;
+            }
+            $this->data[$key] = $value;
+            $this->dirty[$key] = true;
+        }
+        return $this;
+    }
+
+    public function toArray(): array
+    {
+        return $this->data;
+    }
+
+    // ─── Query Builder ────────────────────────────────────────────────────
+
+    public static function where(string $column, string $operator = '=', mixed $value = null): static
+    {
+        $instance = new static();
+
+        if ($value === null) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $instance->conditions[] = [$column, $operator, 'AND'];
+        $instance->bindings[] = $value;
+
+        return $instance;
+    }
+
+    public function orWhere(string $column, string $operator = '=', mixed $value = null): static
+    {
+        if ($value === null) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->conditions[] = [$column, $operator, 'OR'];
+        $this->bindings[] = $value;
+
+        return $this;
+    }
+
+    public function whereIn(string $column, array $values): static
+    {
+        $placeholders = implode(',', array_fill(0, count($values), '?'));
+        $this->conditions[] = [$column, "IN ($placeholders)", 'AND'];
+        $this->bindings = array_merge($this->bindings, $values);
+
+        return $this;
+    }
+
+    public function orderBy(string $column, string $direction = 'ASC'): static
+    {
+        // Sanitize column and direction to prevent SQL injection
+        $direction = strtoupper(trim($direction)) === 'DESC' ? 'DESC' : 'ASC';
+        
+        // Split by dots to support table prefixes (e.g. users.id) and escape with backticks
+        $parts = explode('.', $column);
+        $escapedParts = array_map(fn($part) => '`' . preg_replace('/[^a-zA-Z0-9_]/', '', $part) . '`', $parts);
+        $escapedColumn = implode('.', $escapedParts);
+        
+        $this->order = "$escapedColumn $direction";
+
+        return $this;
+    }
+
+    public function limit(int $limit, ?int $offset = null): static
+    {
+        $this->limit = $limit;
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    protected function buildWhere(): string
+    {
+        if (empty($this->conditions)) {
+            return '';
+        }
+
+        $parts = [];
+
+        foreach ($this->conditions as $i => [$col, $op, $glue]) {
+            if ($i === 0) {
+                $parts[] = "$col $op ?";
+            } else {
+                $parts[] = "$glue $col $op ?";
+            }
+        }
+
+        return ' WHERE ' . implode(' ', $parts);
+    }
+
+    // ─── CRUD ─────────────────────────────────────────────────────────────
+
+    public static function find(mixed $id): ?static
+    {
+        $instance = new static();
+        $pk = $instance->primaryKey;
+
+        $stmt = static::query("SELECT * FROM `{$instance->table}` WHERE `$pk` = ? LIMIT 1", [$id]);
+        if (!$stmt) return null;
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) return null;
+
+        $instance->data = $row;
+        $instance->exists = true;
+
+        return $instance;
+    }
+
+    public static function findAll(): array
+    {
+        return (new static())->get();
+    }
+
+    public function get(): array
+    {
+        $sql = "SELECT * FROM `{$this->table}`";
+        $sql .= $this->buildWhere();
+
+        if ($this->order) {
+            $sql .= " ORDER BY {$this->order}";
+        }
+
+        if ($this->limit !== null) {
+            $sql .= " LIMIT {$this->limit}";
+        }
+
+        if ($this->offset !== null) {
+            $sql .= " OFFSET {$this->offset}";
+        }
+
+        $stmt = static::query($sql, $this->bindings);
+        if (!$stmt) return [];
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = [];
+
+        foreach ($rows as $row) {
+            $instance = new static();
+            $instance->data = $row;
+            $instance->exists = true;
+            $results[] = $instance;
+        }
+
+        return $results;
+    }
+
+    public function first(): ?static
+    {
+        $this->limit = 1;
+        $results = $this->get();
+
+        return $results[0] ?? null;
+    }
+
+    public function count(): int
+    {
+        $sql = "SELECT COUNT(*) as count FROM `{$this->table}`";
+        $sql .= $this->buildWhere();
+
+        $stmt = static::query($sql, $this->bindings);
+        if (!$stmt) return 0;
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int)($row['count'] ?? 0);
+    }
+
+    public function existsRow(): bool
+    {
+        return $this->count() > 0;
+    }
+
+    public function save(): bool
+    {
+        if ($this->exists && isset($this->data[$this->primaryKey])) {
+            return $this->update();
+        }
+
+        return $this->insert();
+    }
+
+    protected function insert(): bool
+    {
+        $columns = array_keys($this->data);
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $cols = '`' . implode('`, `', $columns) . '`';
+
+        $sql = "INSERT INTO `{$this->table}` ($cols) VALUES ($placeholders)";
+
+        $stmt = static::query($sql, array_values($this->data));
+        if (!$stmt) return false;
+
+        $this->data[$this->primaryKey] = static::pdo()->lastInsertId();
+        $this->exists = true;
+        $this->dirty = [];
+
+        return true;
+    }
+
+    protected function update(): bool
+    {
+        if (empty($this->dirty)) return true;
+
+        $pk = $this->primaryKey;
+        $sets = [];
+        $values = [];
+
+        foreach (array_keys($this->dirty) as $column) {
+            $sets[] = "`$column` = ?";
+            $values[] = $this->data[$column];
+        }
+
+        $values[] = $this->data[$pk];
+
+        $sql = "UPDATE `{$this->table}` SET " . implode(', ', $sets) . " WHERE `$pk` = ?";
+
+        $stmt = static::query($sql, $values);
+        if (!$stmt) return false;
+
+        $this->dirty = [];
+
+        return true;
+    }
+
+    public function delete(): bool
+    {
+        if (!$this->exists) return false;
+
+        $pk = $this->primaryKey;
+        $sql = "DELETE FROM `{$this->table}` WHERE `$pk` = ?";
+
+        $stmt = static::query($sql, [$this->data[$pk]]);
+        if (!$stmt) return false;
+
+        $this->exists = false;
+
+        return true;
+    }
+
+    public function deleteMany(): bool
+    {
+        $sql = "DELETE FROM `{$this->table}`";
+        $sql .= $this->buildWhere();
+
+        $stmt = static::query($sql, $this->bindings);
+
+        return $stmt !== false;
+    }
+
+    public function paginate(int $page = 1, int $perPage = 25): array
+    {
+        $total = $this->count();
+        $this->limit($perPage, ($page - 1) * $perPage);
+        $items = $this->get();
+
+        return [
+            'items'    => $items,
+            'total'    => $total,
+            'page'     => $page,
+            'perPage'  => $perPage,
+            'lastPage' => max(1, (int)ceil($total / $perPage)),
+            'hasPrev'  => $page > 1,
+            'hasNext'  => $page * $perPage < $total,
+        ];
+    }
+
+    // ─── Schema helpers (multidriver) ─────────────────────────────────────
+
+    public static function getColumns(string $table): array
+    {
+        $pdo = static::pdo();
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+        if ($driver === 'sqlite') {
+            $stmt = static::query("PRAGMA table_info(`$table`)");
+
+            return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+        }
+
+        $stmt = static::query("SHOW COLUMNS FROM `$table`");
+
+        return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    }
+
+    public static function getTables(): array
+    {
+        $pdo = static::pdo();
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+
+        if ($driver === 'sqlite') {
+            $stmt = static::query("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+
+            return $stmt ? $stmt->fetchAll(PDO::FETCH_COLUMN) : [];
+        }
+
+        $stmt = static::query("SHOW TABLES");
+
+        return $stmt ? $stmt->fetchAll(PDO::FETCH_COLUMN) : [];
+    }
+}

@@ -1,0 +1,89 @@
+<?php
+$title = 'Profile';
+
+ob_start();
+?>
+{{USE_TAILWIND}}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+        <div class="flex items-center gap-6 mb-8 pb-8 border-b border-slate-100">
+            <div class="w-20 h-20 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 font-bold text-3xl border border-indigo-200">
+                <?= strtoupper(substr($userName ?? "U", 0, 1)) ?>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900"><?= htmlspecialchars($userName ?? "", ENT_QUOTES, "UTF-8") ?></h1>
+                 <p class="text-slate-500">Your Profile</p>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Name</label>
+                <p class="text-slate-900 text-lg font-medium"><?= htmlspecialchars($userName ?? "", ENT_QUOTES, "UTF-8") ?></p>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Email</label>
+                <p class="text-slate-900 text-lg font-medium"><?= htmlspecialchars($userEmail ?? "", ENT_QUOTES, "UTF-8") ?></p>
+            </div>
+            <?php if (!empty($memberSince)): ?>
+            <div>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Member since</label>
+                <p class="text-slate-900 text-lg font-medium"><?= htmlspecialchars(date("d M, Y", strtotime($memberSince)), ENT_QUOTES, "UTF-8") ?></p>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="mt-8 pt-8 border-t border-slate-100 flex gap-4">
+            <a href="/home" class="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                Back to Dashboard
+            </a>
+            <a href="/logout" class="px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all">
+                Sign Out
+            </a>
+        </div>
+    </div>
+</div>
+{{/USE_TAILWIND}}
+{{USE_BOOTSTRAP}}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5">
+                <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom">
+                    <div class="bg-primary bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <span class="text-primary fw-bold fs-1"><?= strtoupper(substr($userName ?? "U", 0, 1)) ?></span>
+                    </div>
+                    <div>
+                        <h1 class="h3 fw-bold mb-1"><?= htmlspecialchars($userName ?? "", ENT_QUOTES, "UTF-8") ?></h1>
+                        <p class="text-muted mb-0">Your profile</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">Name</label>
+                    <p class="fs-5 fw-medium mb-0"><?= htmlspecialchars($userName ?? "", ENT_QUOTES, "UTF-8") ?></p>
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">Email</label>
+                    <p class="fs-5 fw-medium mb-0"><?= htmlspecialchars($userEmail ?? "", ENT_QUOTES, "UTF-8") ?></p>
+                </div>
+                <?php if (!empty($memberSince)): ?>
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">Member since</label>
+                    <p class="fs-5 fw-medium mb-0"><?= htmlspecialchars(date("d M, Y", strtotime($memberSince)), ENT_QUOTES, "UTF-8") ?></p>
+                </div>
+                <?php endif; ?>
+
+                <div class="mt-4 pt-4 border-top d-flex gap-3">
+                    <a href="/home" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Back to Dashboard</a>
+                    <a href="/logout" class="btn btn-outline-secondary rounded-pill px-4 fw-bold">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/USE_BOOTSTRAP}}
+<?php
+$content = ob_get_clean();
+require_once __DIR__ . '/layout/app.php';
+?>
