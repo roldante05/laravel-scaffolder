@@ -5,6 +5,40 @@ $lang = isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'es']) ? $_GET['l
 ob_start();
 ?>
 {{USE_TAILWIND}}
+<style>
+/* Adaptar estilos de documentación (welcome.php) para el tema claro cuando el usuario está logueado */
+.logged-in-layout .text-white:not(pre):not(code):not(pre *):not(code *) {
+    color: #1e293b !important; /* text-slate-800 */
+}
+.logged-in-layout .text-gray-400:not(pre):not(code):not(pre *):not(code *) {
+    color: #475569 !important; /* text-slate-600 */
+}
+.logged-in-layout .text-gray-500:not(pre):not(code):not(pre *):not(code *) {
+    color: #64748b !important; /* text-slate-500 */
+}
+.logged-in-layout .text-gray-300:not(pre):not(code):not(pre *):not(code *) {
+    color: #334155 !important; /* text-slate-700 */
+}
+.logged-in-layout .border-gray-800:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #cbd5e1 !important; /* border-slate-300 */
+}
+.logged-in-layout .border-l-gray-800:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #e2e8f0 !important;
+}
+.logged-in-layout nav.border-l {
+    border-color: #cbd5e1 !important;
+}
+.logged-in-layout .hover\:text-white:hover:not(pre):not(code):not(pre *):not(code *) {
+    color: #0f172a !important; /* hover:text-slate-900 */
+}
+.logged-in-layout code.text-indigo-400 {
+    color: #4f46e5 !important;
+    background-color: #f1f5f9 !important;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.375rem;
+    font-size: 0.875em;
+}
+</style>
 <div class="flex gap-12 max-w-6xl mx-auto px-6 py-16">
     <div class="flex-1 min-w-0">
         <div class="text-center mb-16">
@@ -130,7 +164,7 @@ ob_start();
                     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                         <div class="flex items-start gap-4">
                             <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che serve</span>
-                            <span class="text-gray-400 text-sm">Inicia el servidor de desarrollo en <code class="text-gray-300">localhost:8080</code>.</span>
+                            <span class="text-gray-400 text-sm">Inicia el servidor de desarrollo en <code class="text-gray-300">localhost:8080</code> (ideal para SQLite / desarrollo rápido).</span>
                         </div>
                     </div>
                     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
@@ -162,7 +196,7 @@ ob_start();
                     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                         <div class="flex items-start gap-4">
                             <span class="text-indigo-400 font-mono text-sm whitespace-nowrap mt-0.5">php che serve</span>
-                            <span class="text-gray-400 text-sm">Starts the development server at <code class="text-gray-300">localhost:8080</code>.</span>
+                            <span class="text-gray-400 text-sm">Starts the development server at <code class="text-gray-300">localhost:8080</code> (ideal for SQLite / quick development).</span>
                         </div>
                     </div>
                     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
@@ -244,23 +278,15 @@ class HomeController extends Controller
                 <h2 class="text-2xl font-bold text-white mb-4">Vistas</h2>
                 <p class="text-gray-400 leading-relaxed mb-4">
                     Las vistas son archivos PHP planos en <code class="text-indigo-400">src/Views/</code>. 
-                    Usan un sistema de layout donde la vista fija <code class="text-gray-300">$content</code> 
-                    y <code class="text-gray-300">$title</code>, y el layout <code class="text-gray-300">layout/app.php</code> 
-                    envuelve todo:
+                    El método <code class="text-indigo-400">$this->render()</code> del controlador se encarga de renderizar la vista y aplicar el layout automáticamente.
                 </p>
             <?php else: ?>
                 <h2 class="text-2xl font-bold text-white mb-4">Views</h2>
                 <p class="text-gray-400 leading-relaxed mb-4">
                     Views are flat PHP files in <code class="text-indigo-400">src/Views/</code>. 
-                    They use a layout system where the view sets <code class="text-gray-300">$content</code> 
-                    and <code class="text-gray-300">$title</code>, and the <code class="text-gray-300">layout/app.php</code> layout 
-                    wraps everything:
+                    The controller's <code class="text-indigo-400">$this->render()</code> method handles view rendering and applies the layout automatically.
                 </p>
             <?php endif; ?>
-            <pre class="bg-gray-900 border border-gray-800 rounded-xl p-6 overflow-x-auto text-sm text-gray-300 leading-7"><code>&lt;?php
-$title = "Dashboard";
-$content = "&lt;h1&gt;Welcome, &lt;?= htmlspecialchars(\$user) ?&gt;&lt;/h1&gt;";
-require_once __DIR__ . "/layout/app.php";</code></pre>
             <?php if ($lang === 'es'): ?>
                 <p class="text-gray-400 leading-relaxed mt-4">
                     El layout maneja dos modos: <span class="text-gray-300 font-semibold">dashboard</span> (usuario logueado, 
@@ -408,6 +434,22 @@ if (Auth::check()) { /* ... */ }
 </div>
 {{/USE_TAILWIND}}
 {{USE_BOOTSTRAP}}
+<style>
+/* Adaptar estilos de documentación para Bootstrap claro cuando el usuario está logueado */
+.logged-in-layout .text-white:not(pre):not(code):not(pre *):not(code *),
+.logged-in-layout .text-light:not(pre):not(code):not(pre *):not(code *) {
+    color: #1e293b !important;
+}
+.logged-in-layout .text-secondary:not(pre):not(code):not(pre *):not(code *) {
+    color: #475569 !important;
+}
+.logged-in-layout .text-light-emphasis:not(pre):not(code):not(pre *):not(code *) {
+    color: #334155 !important;
+}
+.logged-in-layout .border-secondary:not(pre):not(code):not(pre *):not(code *) {
+    border-color: #cbd5e1 !important;
+}
+</style>
 <div class="container-fluid py-5 text-light">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -470,7 +512,7 @@ if (Auth::check()) { /* ... */ }
                     <ul class="list-unstyled">
                         <li class="mb-2"><code class="text-primary">php che migrate</code> <span class="text-secondary">— Ejecuta migraciones pendientes</span></li>
                         <li class="mb-2"><code class="text-primary">php che rollback</code> <span class="text-secondary">— Revierte el último batch</span></li>
-                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Inicia servidor de desarrollo</span></li>
+                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Inicia servidor de desarrollo (ideal para SQLite / desarrollo rápido)</span></li>
                         <li class="mb-2"><code class="text-primary">php che route:list</code> <span class="text-secondary">— Lista rutas registradas</span></li>
                     </ul>
                 <?php else: ?>
@@ -478,7 +520,7 @@ if (Auth::check()) { /* ... */ }
                     <ul class="list-unstyled">
                         <li class="mb-2"><code class="text-primary">php che migrate</code> <span class="text-secondary">— Executes pending migrations</span></li>
                         <li class="mb-2"><code class="text-primary">php che rollback</code> <span class="text-secondary">— Rolls back the last batch</span></li>
-                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Starts the development server</span></li>
+                        <li class="mb-2"><code class="text-primary">php che serve</code> <span class="text-secondary">— Starts the development server (ideal for SQLite / quick development)</span></li>
                         <li class="mb-2"><code class="text-primary">php che route:list</code> <span class="text-secondary">— Lists registered routes</span></li>
                     </ul>
                 <?php endif; ?>
@@ -524,19 +566,20 @@ class HomeController extends Controller
 }</code></pre>
             </section>
 
-            <section class="mb-5" id="vistas" style="scroll-margin-top: 100px;">
-                <?php if ($lang === 'es'): ?>
-                    <h2 class="h3 fw-bold text-white mb-3">Vistas</h2>
-                    <p class="text-secondary mb-3">Archivos PHP planos en <code class="text-primary">src/Views/</code> con sistema de layout:</p>
-                <?php else: ?>
-                    <h2 class="h3 fw-bold text-white mb-3">Views</h2>
-                    <p class="text-secondary mb-3">Flat PHP files in <code class="text-primary">src/Views/</code> with layout system:</p>
-                <?php endif; ?>
-                <pre class="bg-dark border border-secondary rounded p-4 text-light small"><code>&lt;?php
-$title = "Dashboard";
-$content = "&lt;h1&gt;Welcome, &lt;?= \$user ?&gt;&lt;/h1&gt;";
-require_once __DIR__ . "/layout/app.php";</code></pre>
-            </section>
+             <section class="mb-5" id="vistas" style="scroll-margin-top: 100px;">
+                 <?php if ($lang === 'es'): ?>
+                     <h2 class="h3 fw-bold text-white mb-3">Vistas</h2>
+                     <p class="text-secondary mb-3">El método <code class="text-primary">$this->render()</code> del controlador se encarga de renderizar la vista y aplicar el layout automáticamente.</p>
+                 <?php else: ?>
+                     <h2 class="h3 fw-bold text-white mb-3">Views</h2>
+                     <p class="text-secondary mb-3">The controller's <code class="text-primary">$this->render()</code> method handles view rendering and applies the layout automatically.</p>
+                 <?php endif; ?>
+                 <?php if ($lang === 'es'): ?>
+                     <p class="text-secondary mb-3">El layout maneja dos modos: <span class="text-secondary fw-bold">dashboard</span> (usuario logueado, con sidebar y header) y <span class="text-secondary fw-bold">público</span> (landing page sin autenticación).</p>
+                 <?php else: ?>
+                     <p class="text-secondary mb-3">The layout handles two modes: <span class="text-secondary fw-bold">dashboard</span> (logged-in user, with sidebar and header) and <span class="text-secondary fw-bold">public</span> (landing page without authentication).</p>
+                 <?php endif; ?>
+             </section>
 
             <section class="mb-5" id="orm-y-modelos" style="scroll-margin-top: 100px;">
                 <?php if ($lang === 'es'): ?>
