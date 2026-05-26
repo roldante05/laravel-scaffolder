@@ -39,75 +39,73 @@ Follow these steps to install the tool and create your first project:
 
 ### 1. Installation
 
-You can install Scaffolding Factory in three ways:
+You can install and run Scaffolding Factory in two ways:
 
-#### Option A: Global Installation (Recommended for quick usage)
-Since this tool is currently not on Packagist, you can register its GitHub repository and install it globally via Composer:
-```bash
-composer global config repositories.scaffolding-factory vcs https://github.com/roldante05/scaffolding-factory
-composer global require roldante05/scaffolding-factory:dev-main
-```
-*Note: Make sure your global Composer vendor bin directory (usually `~/.config/composer/vendor/bin` or `~/.composer/vendor/bin`) is in your system's PATH.*
-
-#### Option B: Local Repository Link (Recommended for Development)
-If you want to contribute to the scaffolder or test local changes globally in real-time (similar to `npm link`), define a local `path` repository in your global Composer config:
-
-1. Open your global `composer.json` (usually at `~/.config/composer/composer.json` or `~/.composer/composer.json`) and register your local clone path:
-   ```json
-   {
-       "repositories": {
-           "local-scaffolder": {
-               "type": "path",
-               "url": "/absolute/path/to/your/laravel-scaffolder",
-               "options": {
-                   "symlink": true
-               }
-           }
-       },
-       "require": {
-           "roldante05/scaffolding-factory": "dev-main"
-       }
-   }
-   ```
-2. Run the update command globally:
-   ```bash
-   composer global update roldante05/scaffolding-factory
-   ```
-   Composer will symlink your local folder, so any change you save in your editor is reflected instantly when running the global `scaffold` command!
-
-#### Option C: Manual Local Setup
-If you prefer not to install the command globally, you can clone the repository and run it locally:
-1. Clone the repository:
+#### Option A: Clone the Repository (Manual Local Setup)
+If you want to contribute, run the tool locally, or prefer not to install global binaries:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/roldante05/scaffolding-factory.git
    cd scaffolding-factory
    ```
-2. Install local dependencies:
+2. **Install dependencies**:
    ```bash
    composer install
    ```
-3. Use it directly:
+3. **Create a project**: Run the command directly using PHP:
    ```bash
    php bin/scaffold new my-web-project
    ```
 
----
+#### Option B: Global Composer Installation (Recommended for quick usage)
+Allows you to execute the `scaffold` command globally from any directory on your machine:
 
-### 2. Create a New Project
-Run the `new` command and provide a name for your project:
+##### B1. Install from GitHub directly (Stable)
+Register the VCS repository and install it globally:
+```bash
+composer global config repositories.scaffolding-factory vcs https://github.com/roldante05/scaffolding-factory
+composer global require roldante05/scaffolding-factory:dev-main
+```
+
+##### B2. Link your local clone (For live development, similar to `npm link`)
+If you want to test your local edits in real-time, open your global `composer.json` (usually at `~/.config/composer/composer.json` or `~/.composer/composer.json`) and configure a local `path` repository:
+```json
+{
+    "repositories": {
+        "local-scaffolder": {
+            "type": "path",
+            "url": "/absolute/path/to/your/laravel-scaffolder",
+            "options": {
+                "symlink": true
+            }
+        }
+    },
+    "require": {
+        "roldante05/scaffolding-factory": "dev-main"
+    }
+}
+```
+Then run the global update:
+```bash
+composer global update roldante05/scaffolding-factory
+```
+
+##### Usage
+Make sure your global Composer vendor bin directory (usually `~/.config/composer/vendor/bin` or `~/.composer/vendor/bin`) is in your system's PATH, and run the command from any folder:
 ```bash
 scaffold new my-web-project
 ```
-*(If you are using Option C, run `php bin/scaffold new my-web-project` instead).*
 
-### 5. Follow the Interactive Wizard
+---
+
+### 2. Follow the Interactive Wizard
 The CLI uses a premium TUI (Terminal User Interface) with **Laravel Prompts**. Use the arrow keys to select your preferences:
 - **Project Type**: Laravel or PHP Vanilla.
 - **Starter Kit**: Choose your authentication and stack preferences.
 - **Database**: Select from SQLite, MySQL, MariaDB, or PostgreSQL.
 - **Design**: Pick your favorite CSS framework.
 
-### 4. Initialize and Run
+### 3. Initialize and Run
 Once the scaffolding is complete, navigate to your project folder and run the installation script:
 ```bash
 cd my-web-project
