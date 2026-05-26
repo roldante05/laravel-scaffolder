@@ -47,19 +47,63 @@ cd scaffolding-factory
 ### 2. Instalar Dependencias
 Instala las dependencias de PHP requeridas utilizando Composer:
 ```bash
+composer global require roldante05/scaffolding-factory
+```
+*Nota: Asegúrate de que el directorio bin de composer global esté en el PATH de tu sistema.*
+
+<<<<<<< Updated upstream
+### 2. Crea un Nuevo Proyecto
+=======
+### 2. Instalar Dependencias
+Instala las dependencias de PHP requeridas utilizando Composer:
+```bash
 composer install
 ```
 
 ### 3. Hacer Accesible la CLI
-La herramienta CLI está disponible en `bin/scaffold`. Puedes:
-- Usarla directamente: `php bin/scaffold new mi-proyecto-web`
-- O agregar el directorio `bin` a tu PATH para un acceso más fácil:
+La herramienta CLI está disponible en `bin/scaffold`. Tienes tres opciones para usarla:
+
+- **Opción A: Ejecutar Localmente**
+  Usa la ruta directa desde el repositorio clonado:
+  ```bash
+  php bin/scaffold new mi-proyecto-web
+  ```
+
+- **Opción B: Agregar el Directorio al PATH**
+  Agrega el directorio `bin` a tu PATH para un acceso más fácil:
   ```bash
   export PATH="$PATH:$(pwd)/bin"
   # Añade la línea anterior a tu perfil de shell (ej. ~/.bashrc, ~/.zshrc) para acceso permanente
   ```
 
+- **Opción C: Instalación Global vía Composer (Recomendado para Desarrollo)**
+  Para poder usar el comando `scaffold` desde cualquier carpeta de tu sistema y que los cambios que hagas localmente se reflejen al instante (como `npm link`), configura un repositorio local de tipo `path` en tu configuración global de Composer:
+
+  1. Abre tu `composer.json` global (usualmente ubicado en `~/.config/composer/composer.json` o `~/.composer/composer.json`) y agrega el repositorio apuntando a tu clon local:
+     ```json
+     {
+         "repositories": {
+             "local-scaffolder": {
+                 "type": "path",
+                 "url": "/ruta/absoluta/a/tu/laravel-scaffolder",
+                 "options": {
+                     "symlink": true
+                 }
+             }
+         },
+         "require": {
+             "roldante05/scaffolding-factory": "dev-main"
+         }
+     }
+     ```
+  2. Ejecuta la actualización global:
+     ```bash
+     composer global update roldante05/scaffolding-factory
+     ```
+     Composer creará un enlace simbólico automático a tu carpeta local. ¡Cualquier cambio que guardes en tu editor se reflejará al instante cuando corras `scaffold` de forma global!
+
 ### 4. Crear un Nuevo Proyecto
+>>>>>>> Stashed changes
 Ejecuta el comando `new` y proporciona un nombre para tu proyecto:
 ```bash
 scaffold new mi-proyecto-web
